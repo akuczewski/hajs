@@ -141,8 +141,8 @@ export default function SavingsScreen() {
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-5"
-                  value={assetBalance}
-                  onChangeText={setAssetBalance}
+                  value={assetAmount}
+                  onChangeText={setAssetAmount}
                 />
                 
                 <View className="flex-row flex-wrap gap-2 mb-6">
