@@ -6,24 +6,14 @@ import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Ban
 import { AccountType } from '../../store/types';
 import Svg, { Path } from 'react-native-svg';
 
-const accountIconMap: Record<AccountType, JSX.Element> = {
-  'BANK': <Landmark color="#3B82F6" size={24} />,
-  'DEPOSIT': <ShieldCheck color="#8B5CF6" size={24} />,
-  'CASH': <Banknote color="#10B981" size={24} />,
-  'CRYPTO': <Bitcoin color="#F59E0B" size={24} />,
-  'PRECIOUS_METAL': <Coins color="#EAB308" size={24} />,
-  'BONDS': <Wallet color="#9CA3AF" size={24} />,
-  'STOCKS': <LineChart color="#EC4899" size={24} />
-};
-
-const accountTypeLabels: Record<AccountType, string> = {
-  'BANK': 'Konto Bankowe',
-  'DEPOSIT': 'Lokata',
-  'CASH': 'Gotówka',
-  'CRYPTO': 'Kryptowaluty (BTC)',
-  'PRECIOUS_METAL': 'Złoto / Kruszce',
-  'BONDS': 'Obligacje',
-  'STOCKS': 'Akcje / ETF'
+const ACCOUNT_ICONS: Record<AccountType, any> = {
+  'BANK': Landmark,
+  'DEPOSIT': ShieldCheck,
+  'CASH': Banknote,
+  'CRYPTO': Bitcoin,
+  'PRECIOUS_METAL': Coins,
+  'BONDS': Wallet,
+  'STOCKS': LineChart
 };
 
 const iconMap: Record<string, JSX.Element> = {
