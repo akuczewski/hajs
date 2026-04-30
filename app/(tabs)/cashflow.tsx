@@ -79,13 +79,13 @@ export default function CashflowScreen() {
         <View className="flex-row bg-[#1C1F22] rounded-xl p-1 border border-[#272A2E]">
           <TouchableOpacity 
             onPress={() => setActiveTab('INCOMES')}
-            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'INCOMES' ? 'bg-[#262A2E] shadow-sm' : ''}`}
+            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'INCOMES' ? 'bg-[#262A2E]' : ''}`}
           >
             <Text className={`font-bold ${activeTab === 'INCOMES' ? 'text-[#34D399]' : 'text-zinc-500'}`}>INCOMES</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setActiveTab('EXPENSES')}
-            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'EXPENSES' ? 'bg-[#262A2E] shadow-sm' : ''}`}
+            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'EXPENSES' ? 'bg-[#262A2E]' : ''}`}
           >
             <Text className={`font-bold ${activeTab === 'EXPENSES' ? 'text-yellow-500' : 'text-zinc-500'}`}>EXPENSES</Text>
           </TouchableOpacity>
@@ -103,7 +103,8 @@ export default function CashflowScreen() {
 
             <TouchableOpacity 
               onPress={() => setIsAddingIncome(!isAddingIncome)}
-              className="bg-[#10B981]/20 border border-[#10B981] rounded-2xl py-4 flex-row justify-center items-center mb-6"
+              style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+              className="border border-[#10B981] rounded-2xl py-4 flex-row justify-center items-center mb-6"
             >
               <Plus color="#10B981" size={20} />
               <Text className="text-[#10B981] font-bold ml-2">Add Income Source</Text>
@@ -184,7 +185,7 @@ export default function CashflowScreen() {
                   </View>
                 </View>
 
-                <TouchableOpacity className="absolute bottom-4 right-4 bg-[#34D399] p-3 rounded-full shadow-lg border border-[#059669]">
+                <TouchableOpacity className="absolute bottom-4 right-4 bg-[#34D399] p-3 rounded-full border border-[#059669]">
                   <Plus color="#022C22" size={24} />
                 </TouchableOpacity>
               </View>
@@ -201,7 +202,8 @@ export default function CashflowScreen() {
 
             <TouchableOpacity 
               onPress={() => setIsAddingExpense(!isAddingExpense)}
-              className="bg-yellow-500/20 border border-yellow-500 rounded-2xl py-4 flex-row justify-center items-center mb-6"
+              style={{ backgroundColor: 'rgba(234, 179, 8, 0.2)' }}
+              className="border border-yellow-500 rounded-2xl py-4 flex-row justify-center items-center mb-6"
             >
               <Plus color="#EAB308" size={20} />
               <Text className="text-yellow-500 font-bold ml-2">Add Expense or Sub</Text>
