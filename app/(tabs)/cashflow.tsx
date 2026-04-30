@@ -133,11 +133,12 @@ export default function CashflowScreen() {
                     <Text className="text-white font-medium">Is this a Fixed Income?</Text>
                     <Text className="text-zinc-500 text-xs mt-1">Variable incomes use 5-month avg.</Text>
                   </View>
-                  <Switch
-                    value={incIsFixed}
-                    onValueChange={setIncIsFixed}
-                    trackColor={{ false: '#3F3F46', true: '#10B981' }}
-                  />
+                  <TouchableOpacity 
+                    onPress={() => setIncIsFixed(!incIsFixed)}
+                    className={`w-12 h-6 rounded-full justify-center px-1 ${incIsFixed ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
+                  >
+                    <View className={`w-4 h-4 rounded-full bg-white ${incIsFixed ? 'self-end' : 'self-start'}`} />
+                  </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={handleAddIncome} className="bg-[#10B981] rounded-xl py-4 items-center">
                   <Text className="text-[#022C22] font-bold text-lg">Save Income</Text>
