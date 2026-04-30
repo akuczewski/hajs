@@ -1,50 +1,48 @@
-# Welcome to your Expo app 👋
+# Hajs 💸
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Hajs** is a premium, privacy-focused budgeting application built with React Native and Expo. It helps you manage your finances using the **"Pay Yourself First"** philosophy, focusing on automating your savings goals (Sinking Funds) and keeping track of your net worth across different asset types.
 
-## Get started
+![Dashboard Preview](file:///Users/rare/.gemini/antigravity/brain/479dbfb6-d3e7-434d-add4-35a5ad630889/fintech_logo_proper_1777583879763.png)
 
-1. Install dependencies
+## ✨ Features
 
+- **🏠 Dashboard**: A high-level overview of your Net Worth and a monthly checklist of obligations.
+- **📈 Cashflow Management**: Track your monthly incomes (fixed and variable) and fixed expenses.
+- **💰 Savings & Assets**: Manage various asset types (Cash, Bank, Crypto, Gold, Stocks) and set Sinking Funds for future goals.
+- **🌍 Internationalization**: Full support for **Polish** and **English** languages.
+- **💱 Dynamic Currency**: Switch between **PLN, USD, and EUR** with automatic net worth conversion.
+- **🔒 100% Private**: All data is stored locally on your device using `AsyncStorage`. No cloud, no trackers, no BS.
+
+## 🚀 Tech Stack
+
+- **Framework**: [Expo](https://expo.dev/) (React Native)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand) with Persistence
+- **Styling**: [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)
+- **Icons**: [Lucide React Native](https://lucide.dev/)
+- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/)
+
+## 🛠 Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/akuczewski/hajs.git
+   ```
+2. Install dependencies:
    ```bash
    npm install
    ```
-
-2. Start the app
-
+3. Start the development server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## 📖 Methodology: Pay Yourself First
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Hajs encourages you to treat your savings as a non-negotiable expense. 
+1. Define your **Fixed Expenses**.
+2. Define your **Sinking Funds** (Goals).
+3. The app calculates your **Free Funds** only after accounting for these obligations.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Created with ❤️ by **Antigravity** (AI Coding Assistant) in collaboration with **Arkadiusz Kuczewski**.
