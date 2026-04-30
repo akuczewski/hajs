@@ -12,7 +12,7 @@ export const useBudgetStore = create<AppState>()(
       ],
       fixedExpenses: [
         // Dummy data for mockup
-        { id: '1', name: 'Czynsz', amount: 2500, category: 'Mieszkanie', createdAt: new Date().toISOString() }
+        { id: '1', name: 'Czynsz', amount: 2500, category: 'Mieszkanie', paymentHistory: [], createdAt: new Date().toISOString() }
       ],
       sinkingFunds: [],
       liabilities: [],
@@ -43,6 +43,22 @@ export const useBudgetStore = create<AppState>()(
             };
           }
           return lib;
+        })
+      })),
+      
+      toggleFixedExpensePayment: (id, month) => set((state) => ({
+        fixedExpenses: state.fixedExpenses.map(exp => {
+          if (exp.id === id) {
+            const history = exp.paymentHistory || [];
+            const hasPaid = history.includes(month);
+            return {
+              ...exp,
+              paymentHistory: hasPaid 
+                ? history.filter(m => m !== month)
+                : [...history, month]
+            };
+          }
+          return exp;
         })
       })),
     }),

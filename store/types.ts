@@ -15,6 +15,7 @@ export interface FixedExpense {
   name: string;
   amount: number;
   category: string;
+  paymentHistory?: string[]; // 'YYYY-MM'
   createdAt: string;
 }
 
@@ -66,4 +67,5 @@ export interface AppState {
   deleteLiability: (id: string) => void;
 
   toggleLiabilityPayment: (id: string, month: string) => void;
+  toggleFixedExpensePayment: (id: string, month: string) => void;
 }
