@@ -164,31 +164,33 @@ export default function SavingsScreen() {
             <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-4 px-1">{t('savings.yourAssets')}</Text>
             {accounts.length === 0 && <Text className="text-zinc-600 px-1">{t('savings.noAssets')}</Text>}
             {accounts.map(acc => (
-              <View key={acc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
-                <View className="flex-row items-center">
-                  <View className="bg-[#262A2E] p-3 rounded-xl mr-4">
+              <View key={acc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-4 flex-row justify-between items-center">
+                <View className="flex-row items-center flex-1 pr-3">
+                  <View className="bg-[#262A2E] p-3 rounded-2xl mr-4">
                     {React.createElement(ACCOUNT_ICONS[acc.type] as any, { color: '#3B82F6', size: 24 })}
                   </View>
-                  <View>
-                    <Text className="text-white font-bold text-lg">{acc.name}</Text>
-                    <Text className="text-zinc-500 text-xs uppercase">{acc.type}</Text>
+                  <View className="flex-1">
+                    <Text className="text-white font-bold text-lg" numberOfLines={1}>{acc.name}</Text>
+                    <Text className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">{acc.type}</Text>
                   </View>
                 </View>
-                <View className="flex-row items-center">
-                  <Text className="text-white font-bold text-lg mr-3">{symbol}{acc.balance.toLocaleString()}</Text>
-                  <TouchableOpacity 
-                    onPress={() => {
-                      setEditingAsset(acc.id);
-                      setEditAssetName(acc.name);
-                      setEditAssetBalance(acc.balance.toString());
-                    }}
-                    className="bg-[#262A2E] p-2 rounded-lg mr-2"
-                  >
-                    <LineChart color="#60A5FA" size={18} />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteAccount(acc.id)} className="bg-[#262A2E] p-2 rounded-lg">
-                    <Trash2 color="#EF4444" size={18} />
-                  </TouchableOpacity>
+                <View className="items-end">
+                  <Text className="text-white font-bold text-lg mb-2">{symbol}{acc.balance.toLocaleString()}</Text>
+                  <View className="flex-row gap-2">
+                    <TouchableOpacity 
+                      onPress={() => {
+                        setEditingAsset(acc.id);
+                        setEditAssetName(acc.name);
+                        setEditAssetBalance(acc.balance.toString());
+                      }}
+                      className="bg-[#262A2E] p-2 rounded-xl"
+                    >
+                      <LineChart color="#60A5FA" size={16} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteAccount(acc.id)} className="bg-[#262A2E] p-2 rounded-xl">
+                      <Trash2 color="#EF4444" size={16} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             ))}
