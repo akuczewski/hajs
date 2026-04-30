@@ -1,41 +1,55 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Home, TrendingUp, CreditCard } from 'lucide-react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { LayoutDashboard, Landmark, ArrowRightLeft, CalendarCheck, PiggyBank } from 'lucide-react-native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#60A5FA',
-        tabBarInactiveTintColor: '#71717A',
+        tabBarInactiveTintColor: '#52525B',
         tabBarStyle: {
           backgroundColor: '#09090B',
           borderTopColor: '#27272A',
+          paddingBottom: 5,
+          paddingTop: 5,
+          height: 60,
         },
         headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Start',
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />,
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <LayoutDashboard size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="incomes"
+        name="accounts"
         options={{
-          title: 'Przychody',
-          tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
+          title: 'Accounts',
+          tabBarIcon: ({ color }) => <Landmark size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="expenses"
+        name="cashflow"
         options={{
-          title: 'Wydatki',
-          tabBarIcon: ({ color }) => <CreditCard size={24} color={color} />,
+          title: 'Cashflow',
+          tabBarIcon: ({ color }) => <ArrowRightLeft size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="subscriptions"
+        options={{
+          title: 'Subscriptions',
+          tabBarIcon: ({ color }) => <CalendarCheck size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="savings"
+        options={{
+          title: 'Savings',
+          tabBarIcon: ({ color }) => <PiggyBank size={24} color={color} />,
         }}
       />
     </Tabs>
