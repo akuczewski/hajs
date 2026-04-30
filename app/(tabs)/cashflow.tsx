@@ -283,23 +283,26 @@ export default function CashflowScreen() {
                 )}
 
                 {expType === 'CREDIT' && (
-                  <View className="flex-row justify-between mb-4">
-                    <TextInput
-                      placeholder="Total Installments (e.g. 24)"
-                      placeholderTextColor="#71717A"
-                      keyboardType="numeric"
-                      className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 mr-2"
-                      value={creditTotalInstallments}
-                      onChangeText={setCreditTotalInstallments}
-                    />
-                    <TextInput
-                      placeholder="Already Paid (e.g. 5)"
-                      placeholderTextColor="#71717A"
-                      keyboardType="numeric"
-                      className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 ml-2"
-                      value={creditPaidInstallments}
-                      onChangeText={setCreditPaidInstallments}
-                    />
+                  <View className="mb-4">
+                    <Text className="text-zinc-400 text-xs mb-2">Number of months/installments (not cash):</Text>
+                    <View className="flex-row justify-between">
+                      <TextInput
+                        placeholder="Total months (e.g. 24)"
+                        placeholderTextColor="#71717A"
+                        keyboardType="numeric"
+                        className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 mr-2"
+                        value={creditTotalInstallments}
+                        onChangeText={setCreditTotalInstallments}
+                      />
+                      <TextInput
+                        placeholder="Months paid (e.g. 5)"
+                        placeholderTextColor="#71717A"
+                        keyboardType="numeric"
+                        className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 ml-2"
+                        value={creditPaidInstallments}
+                        onChangeText={setCreditPaidInstallments}
+                      />
+                    </View>
                   </View>
                 )}
 
