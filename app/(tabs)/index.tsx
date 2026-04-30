@@ -1,25 +1,30 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { useBudgetStore } from '../../store/useBudgetStore';
-import { PlusCircle, Wallet, Bitcoin, Gem, Landmark } from 'lucide-react-native';
+import { PlusCircle, Wallet, Bitcoin, Gem, Landmark, CreditCard } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { AccountType } from '../../store/types';
 
-const accountsMock = [
-  { id: '1', name: 'Bank Accounts', balance: '$850,000', icon: <Landmark color="#10B981" size={20} />, growth: '+20%' },
-  { id: '2', name: 'Cash & Equivalents', balance: '$210,000', icon: <Wallet color="#10B981" size={20} />, growth: '+20%' },
-  { id: '3', name: 'Crypto Holdings', balance: '$150,000', icon: <Bitcoin color="#F59E0B" size={20} />, growth: '+15%' },
-  { id: '4', name: 'Precious Metals', balance: '$35,000', icon: <Gem color="#10B981" size={20} />, growth: '+5%' },
-];
+const typeIcons: Record<AccountType, JSX.Element> = {
+  'BANK': <Landmark color="#10B981" size={20} />,
+  'CASH': <Wallet color="#10B981" size={20} />,
+  'VIRTUAL': <CreditCard color="#8B5CF6" size={20} />,
+  'CRYPTO': <Bitcoin color="#F59E0B" size={20} />,
+  'PRECIOUS_METAL': <Gem color="#10B981" size={20} />
+};
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, sinkingFunds, liabilities } = useBudgetStore();
 
-  // Mocked totals from design
-  const totalIncome = 18500;
-  const totalExpenses = 6200;
+  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalExpenses = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0) + 
+                        liabilities.reduce((acc, curr) => acc + curr.monthlyPayment, 0);
   
-  const incomePercent = '85%';
-  const expensesPercent = '30%';
+  const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
+  const safeToSpend = totalIncome > totalExpenses ? totalIncome - totalExpenses : 0;
+  
+  const incomePercent = totalIncome > 0 ? '100%' : '0%';
+  const expensesPercent = totalIncome > 0 ? `${Math.min((totalExpenses / totalIncome) * 100, 100)}%` : '0%';
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
@@ -27,8 +32,8 @@ export default function DashboardScreen() {
         {/* Header - Net Worth */}
         <View className="px-5 pt-8">
           <Text className="text-white text-3xl font-bold mb-1">Net Worth</Text>
-          <Text className="text-[#34D399] text-6xl font-extrabold tracking-tighter mb-4">
-            $1,245,000
+          <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter mb-4">
+            ${totalNetWorth.toLocaleString()}
           </Text>
         </View>
 
@@ -57,26 +62,30 @@ export default function DashboardScreen() {
 
         {/* Accounts Slider */}
         <View className="pl-5 mb-8">
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={accountsMock}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View className="bg-[#1C1F22] rounded-2xl p-4 mr-4 w-40 border border-[#272A2E]">
-                <View className="flex-row justify-between items-start mb-4">
-                  <View className="bg-[#262A2E] p-2 rounded-lg">
-                    {item.icon}
+          {accounts.length > 0 ? (
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={accounts}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View className="bg-[#1C1F22] rounded-2xl p-4 mr-4 w-40 border border-[#272A2E]">
+                  <View className="flex-row justify-between items-start mb-4">
+                    <View className="bg-[#262A2E] p-2 rounded-lg">
+                      {typeIcons[item.type]}
+                    </View>
+                    <View className="bg-[#10B981]/20 px-2 py-1 rounded-md">
+                      <Text className="text-[#34D399] text-[10px] font-bold">ACTIVE</Text>
+                    </View>
                   </View>
-                  <View className="bg-[#10B981]/20 px-2 py-1 rounded-md">
-                    <Text className="text-[#34D399] text-[10px] font-bold">{item.growth}</Text>
-                  </View>
+                  <Text className="text-zinc-400 text-xs font-medium mb-1">{item.name}</Text>
+                  <Text className="text-white text-xl font-bold">${item.balance.toLocaleString()}</Text>
                 </View>
-                <Text className="text-zinc-400 text-xs font-medium mb-1">{item.name}</Text>
-                <Text className="text-white text-xl font-bold">{item.balance}</Text>
-              </View>
-            )}
-          />
+              )}
+            />
+          ) : (
+            <Text className="text-zinc-500 italic">Brak kont. Przejdź do zakładki Accounts, aby dodać.</Text>
+          )}
         </View>
 
         {/* Monthly Summary */}
@@ -86,7 +95,6 @@ export default function DashboardScreen() {
           <View className="mb-4">
             <View className="flex-row justify-between mb-2">
               <Text className="text-zinc-400 font-medium">Total Income: ${totalIncome.toLocaleString()}</Text>
-              <Text className="text-zinc-400 font-medium">{incomePercent}</Text>
             </View>
             <View className="h-3 w-full bg-[#1C1F22] rounded-full overflow-hidden">
               <View className="h-full bg-[#34D399] rounded-full" style={{ width: incomePercent }} />
@@ -115,7 +123,7 @@ export default function DashboardScreen() {
                 <Wallet size={16} color="#451A03" />
                 <Text className="text-[#451A03] font-bold text-base ml-2">Pay Yourself First</Text>
               </View>
-              <Text className="text-[#78350F] text-[10px] font-bold">Suggested: $2,000</Text>
+              <Text className="text-[#78350F] text-[10px] font-bold">Suggested: ${safeToSpend}</Text>
             </TouchableOpacity>
           </View>
         </View>

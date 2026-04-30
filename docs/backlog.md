@@ -4,11 +4,11 @@
 1. [x] Inicjalizacja projektu Expo i konfiguracja NativeWind/Tailwind.
 2. [x] Przygotowanie architektury Zustand z AsyncStorage.
 3. [x] Przygotowanie modeli TypeScript (Incomes, FixedExpenses, SinkingFunds, Liabilities, Accounts).
-4. [ ] Implementacja Głównego Dashboardu z widokiem Net Worth i "Pay yourself first".
-5. [ ] Implementacja list i formularzy Przychodów (z logiką wyliczania średniej 5 m-cy dla zmiennych).
-6. [ ] Implementacja list Wydatków Stałych.
+4. [x] Implementacja Głównego Dashboardu z widokiem Net Worth i "Pay yourself first".
+5. [x] Implementacja list i formularzy Przychodów (Cashflow).
+6. [x] Implementacja list Wydatków Stałych (Cashflow).
 7. [ ] Implementacja Kosztów Rocznych (Sinking Funds) z wizualizacją w postaci skarbonek.
-8. [ ] Implementacja Zobowiązań (kredyty, subskrypcje) z checkboxami do oznaczania zapłaty.
+8. [x] Implementacja Zobowiązań (kredyty, subskrypcje) z checkboxami do oznaczania zapłaty.
 
 ## Do zrobienia w wersji V2 (Future):
 1. [ ] Ekran z przyciskiem "Zaloguj z Google" dla subskrypcji. Integracja z Google API (Gmail/Play) do automatycznego wykrywania subskrypcji.
