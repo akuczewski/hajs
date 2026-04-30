@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { useBudgetStore, EXCHANGE_RATES, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
 import { Currency } from '../../store/types';
-import { Settings as SettingsIcon, Globe, Trash2, RefreshCcw } from 'lucide-react-native';
+import { Settings as SettingsIcon, Globe, Trash2, RefreshCw } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { currency, changeCurrency } = useBudgetStore();
@@ -26,7 +26,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
-      <ScrollView className="flex-1 pt-6 px-5">
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} className="pt-6 px-5">
         
         {/* Header */}
         <View className="mb-8 flex-row items-center">
@@ -49,7 +49,8 @@ export default function SettingsScreen() {
               <TouchableOpacity
                 key={curr}
                 onPress={() => handleCurrencyChange(curr)}
-                className={`py-3 px-5 rounded-xl border flex-row items-center ${currency === curr ? 'bg-[#3B82F6]/20 border-[#3B82F6]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
+                style={currency === curr ? { backgroundColor: 'rgba(59, 130, 246, 0.2)' } : undefined}
+                className={`py-3 px-5 rounded-xl border flex-row items-center ${currency === curr ? 'border-[#3B82F6]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
               >
                 <Text className={`font-bold mr-2 ${currency === curr ? 'text-[#3B82F6]' : 'text-zinc-400'}`}>
                   {curr}
@@ -63,7 +64,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Danger Zone */}
-        <View className="bg-[#1C1F22] border border-red-900/50 rounded-3xl p-5 mb-8">
+        <View style={{ borderColor: 'rgba(127, 29, 29, 0.5)' }} className="bg-[#1C1F22] border rounded-3xl p-5 mb-8">
           <View className="flex-row items-center mb-4">
             <Trash2 color="#EF4444" size={24} />
             <Text className="text-white text-xl font-bold ml-3">Niebezpieczna Strefa</Text>
@@ -72,8 +73,11 @@ export default function SettingsScreen() {
             Usunięcie danych spowoduje nieodwracalną utratę historii transakcji i wszystkich kont.
           </Text>
 
-          <TouchableOpacity className="bg-red-500/10 border border-red-500/50 py-4 rounded-xl items-center flex-row justify-center">
-            <RefreshCcw color="#EF4444" size={20} />
+          <TouchableOpacity 
+            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.5)' }}
+            className="border py-4 rounded-xl items-center flex-row justify-center"
+          >
+            <RefreshCw color="#EF4444" size={20} />
             <Text className="text-red-500 font-bold ml-2">Wyczyść wszystkie dane (Reset)</Text>
           </TouchableOpacity>
         </View>
