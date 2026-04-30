@@ -166,6 +166,7 @@ export const translations: Translations = {
       monthlyFee: "Opłata miesięczna",
       noFixedExpenses: "Brak stałych wydatków."
     },
+    savings: {
       assetsTab: "AKTYWA",
       goalsTab: "CELE",
       totalNetWorth: "Całkowita Wartość Majątku",
