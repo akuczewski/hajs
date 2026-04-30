@@ -37,7 +37,7 @@ export default function DashboardScreen() {
       kind: 'LIABILITY',
       name: lib.name,
       amount: lib.monthlyPayment,
-      isPaid: lib.paymentHistory.includes(currentMonth)
+      isPaid: lib.paymentHistory?.includes(currentMonth) || false
     }))
   ];
 
@@ -84,7 +84,7 @@ export default function DashboardScreen() {
 
         {/* Action Buttons: Pay Yourself First */}
         <View className="px-5 mb-8 -mt-2">
-          <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 shadow-lg">
+          <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-white font-bold text-lg">Zapłać sobie najpierw 👑</Text>
               <Wallet color="#F59E0B" size={24} />
