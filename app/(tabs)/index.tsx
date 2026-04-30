@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList, TextInput } from 'react-native';
 import { useBudgetStore } from '../../store/useBudgetStore';
-import { PlusCircle, Wallet, Bitcoin, Gem, Landmark, CreditCard } from 'lucide-react-native';
+import { PlusCircle, Wallet, Bitcoin, Gem, Landmark, CreditCard, Plus } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
 
@@ -14,7 +14,12 @@ const typeIcons: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, sinkingFunds, liabilities } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, sinkingFunds, liabilities, addAccount } = useBudgetStore();
+
+  const [isAddingAccount, setIsAddingAccount] = useState(false);
+  const [accName, setAccName] = useState('');
+  const [accBalance, setAccBalance] = useState('');
+  const [accType, setAccType] = useState<AccountType>('BANK');
 
   const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
   const totalExpenses = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0) + 
@@ -25,6 +30,21 @@ export default function DashboardScreen() {
   
   const incomePercent = totalIncome > 0 ? '100%' : '0%';
   const expensesPercent = totalIncome > 0 ? `${Math.min((totalExpenses / totalIncome) * 100, 100)}%` : '0%';
+
+  const handleAddAccount = () => {
+    if (!accName || !accBalance) return;
+    addAccount({
+      id: Date.now().toString(),
+      name: accName,
+      type: accType,
+      balance: parseFloat(accBalance),
+      currency: 'PLN',
+      createdAt: new Date().toISOString()
+    });
+    setAccName('');
+    setAccBalance('');
+    setIsAddingAccount(false);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
@@ -60,32 +80,78 @@ export default function DashboardScreen() {
           <Text className="absolute bottom-2 right-5 text-zinc-500 text-xs">Last 6 months</Text>
         </View>
 
-        {/* Accounts Slider */}
-        <View className="pl-5 mb-8">
-          {accounts.length > 0 ? (
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={accounts}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View className="bg-[#1C1F22] rounded-2xl p-4 mr-4 w-40 border border-[#272A2E]">
-                  <View className="flex-row justify-between items-start mb-4">
-                    <View className="bg-[#262A2E] p-2 rounded-lg">
-                      {typeIcons[item.type]}
-                    </View>
-                    <View className="bg-[#10B981]/20 px-2 py-1 rounded-md">
-                      <Text className="text-[#34D399] text-[10px] font-bold">ACTIVE</Text>
-                    </View>
-                  </View>
-                  <Text className="text-zinc-400 text-xs font-medium mb-1">{item.name}</Text>
-                  <Text className="text-white text-xl font-bold">${item.balance.toLocaleString()}</Text>
-                </View>
-              )}
-            />
-          ) : (
-            <Text className="text-zinc-500 italic">Brak kont. Przejdź do zakładki Accounts, aby dodać.</Text>
+        {/* Accounts Slider & Add Account */}
+        <View className="mb-8">
+          <View className="flex-row justify-between items-center px-5 mb-4">
+            <Text className="text-white text-lg font-bold">Your Accounts</Text>
+            <TouchableOpacity onPress={() => setIsAddingAccount(!isAddingAccount)}>
+              <Plus color="#10B981" size={24} />
+            </TouchableOpacity>
+          </View>
+
+          {isAddingAccount && (
+            <View className="px-5 mb-6">
+              <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5">
+                <Text className="text-white font-bold mb-4">Add New Account</Text>
+                <TextInput
+                  placeholder="Account Name (e.g. mBank)"
+                  placeholderTextColor="#71717A"
+                  className="bg-[#262A2E] text-white p-3 rounded-xl mb-3"
+                  value={accName}
+                  onChangeText={setAccName}
+                />
+                <TextInput
+                  placeholder="Balance"
+                  placeholderTextColor="#71717A"
+                  keyboardType="numeric"
+                  className="bg-[#262A2E] text-white p-3 rounded-xl mb-3"
+                  value={accBalance}
+                  onChangeText={setAccBalance}
+                />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+                  {(['BANK', 'CASH', 'VIRTUAL', 'CRYPTO', 'PRECIOUS_METAL'] as AccountType[]).map((t) => (
+                    <TouchableOpacity 
+                      key={t}
+                      onPress={() => setAccType(t)}
+                      className={`px-3 py-2 rounded-lg border mr-2 ${accType === t ? 'bg-[#3B82F6]/20 border-[#3B82F6]' : 'bg-[#262A2E] border-transparent'}`}
+                    >
+                      <Text className={accType === t ? 'text-[#3B82F6] font-bold text-xs' : 'text-zinc-400 text-xs'}>{t}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity onPress={handleAddAccount} className="bg-[#10B981] rounded-xl py-3 items-center">
+                  <Text className="text-[#022C22] font-bold">Save Account</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
+
+          <View className="pl-5">
+            {accounts.length > 0 ? (
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={accounts}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View className="bg-[#1C1F22] rounded-2xl p-4 mr-4 w-40 border border-[#272A2E]">
+                    <View className="flex-row justify-between items-start mb-4">
+                      <View className="bg-[#262A2E] p-2 rounded-lg">
+                        {typeIcons[item.type]}
+                      </View>
+                      <View className="bg-[#10B981]/20 px-2 py-1 rounded-md">
+                        <Text className="text-[#34D399] text-[10px] font-bold">ACTIVE</Text>
+                      </View>
+                    </View>
+                    <Text className="text-zinc-400 text-xs font-medium mb-1">{item.name}</Text>
+                    <Text className="text-white text-xl font-bold">${item.balance.toLocaleString()}</Text>
+                  </View>
+                )}
+              />
+            ) : (
+              <Text className="text-zinc-500 italic">No accounts added yet. Click + to add.</Text>
+            )}
+          </View>
         </View>
 
         {/* Monthly Summary */}
