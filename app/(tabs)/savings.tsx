@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { useBudgetStore } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
 import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2 } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
 import Svg, { Path } from 'react-native-svg';
@@ -33,7 +33,8 @@ const iconMap: Record<string, JSX.Element> = {
 };
 
 export default function SavingsScreen() {
-  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount } = useBudgetStore();
+  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, currency } = useBudgetStore();
+  const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'ASSETS' | 'GOALS'>('ASSETS');
 
   // Goals State
@@ -115,7 +116,7 @@ export default function SavingsScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">Total Net Worth</Text>
-              <Text className="text-[#3B82F6] text-5xl font-extrabold tracking-tighter">${totalNetWorth.toLocaleString()}</Text>
+              <Text className="text-[#3B82F6] text-5xl font-extrabold tracking-tighter">{symbol}{totalNetWorth.toLocaleString()}</Text>
             </View>
 
             <TouchableOpacity 
@@ -154,7 +155,7 @@ export default function SavingsScreen() {
                   onChangeText={setAssetName}
                 />
                 <TextInput
-                  placeholder="Aktualna wartość ($)"
+                  placeholder={`Aktualna wartość (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-5"
@@ -181,7 +182,7 @@ export default function SavingsScreen() {
                   </View>
                 </View>
                 <View className="flex-row items-center">
-                  <Text className="text-white font-bold text-lg mr-3">${acc.balance.toLocaleString()}</Text>
+                  <Text className="text-white font-bold text-lg mr-3">{symbol}{acc.balance.toLocaleString()}</Text>
                   <TouchableOpacity onPress={() => deleteAccount(acc.id)} className="bg-[#262A2E] p-2 rounded-lg">
                     <Trash2 color="#EF4444" size={18} />
                   </TouchableOpacity>
@@ -196,8 +197,8 @@ export default function SavingsScreen() {
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 flex-row items-center justify-between">
               <View>
                 <Text className="text-zinc-400 font-medium mb-1">Total Savings Goals</Text>
-                <Text className="text-[#34D399] text-4xl font-extrabold tracking-tighter">${totalSaved.toLocaleString()}</Text>
-                <Text className="text-zinc-500 text-xs mt-1">Goal: ${totalTarget.toLocaleString()}</Text>
+                <Text className="text-[#34D399] text-4xl font-extrabold tracking-tighter">{symbol}{totalSaved.toLocaleString()}</Text>
+                <Text className="text-zinc-500 text-xs mt-1">Goal: {symbol}{totalTarget.toLocaleString()}</Text>
               </View>
               <View className="bg-[#262A2E] p-4 rounded-full border border-zinc-700">
                 <PiggyBank color="#34D399" size={32} />
@@ -224,7 +225,7 @@ export default function SavingsScreen() {
                   onChangeText={setGoalName}
                 />
                 <TextInput
-                  placeholder="Target Amount ($)"
+                  placeholder={`Target Amount (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-3"
@@ -271,8 +272,8 @@ export default function SavingsScreen() {
 
                   <View className="mb-4">
                     <View className="flex-row justify-between mb-2">
-                      <Text className="text-white font-bold">${fund.savedAmount.toLocaleString()}</Text>
-                      <Text className="text-zinc-500 font-medium">of ${fund.targetAmount.toLocaleString()}</Text>
+                      <Text className="text-white font-bold">{symbol}{fund.savedAmount.toLocaleString()}</Text>
+                      <Text className="text-zinc-500 font-medium">of {symbol}{fund.targetAmount.toLocaleString()}</Text>
                     </View>
                     <View className="h-2 w-full bg-[#262A2E] rounded-full overflow-hidden">
                       <View className="h-full bg-[#8B5CF6] rounded-full" style={{ width: `${progressPercent}%` }} />
@@ -281,7 +282,7 @@ export default function SavingsScreen() {
 
                   <View className="flex-row justify-between items-center bg-[#111315] p-3 rounded-xl border border-[#272A2E]">
                     <Text className="text-zinc-400 text-xs">Monthly to save</Text>
-                    <Text className="text-white font-bold">${monthlyRequired.toFixed(2)}</Text>
+                    <Text className="text-white font-bold">{symbol}{monthlyRequired.toFixed(2)}</Text>
                   </View>
                 </View>
               );

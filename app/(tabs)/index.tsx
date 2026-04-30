@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useBudgetStore } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
 import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
@@ -16,7 +16,8 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, liabilities, toggleLiabilityPayment, toggleFixedExpensePayment } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, toggleLiabilityPayment, toggleFixedExpensePayment, currency } = useBudgetStore();
+  const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
@@ -56,7 +57,7 @@ export default function DashboardScreen() {
         <View className="px-5 mb-2">
           <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">Twoje Całkowite Net Worth</Text>
           <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">
-            ${totalNetWorth.toLocaleString()}
+            {symbol}{totalNetWorth.toLocaleString()}
           </Text>
         </View>
 
@@ -92,7 +93,7 @@ export default function DashboardScreen() {
             <Text className="text-zinc-400 text-sm mb-4">Po opłaceniu wszystkich stałych rachunków, do dyspozycji pozostaje Ci kwota, którą możesz przelać na Sinking Funds.</Text>
             <View className="bg-[#111315] p-4 rounded-2xl flex-row justify-between items-center border border-[#272A2E]">
               <Text className="text-zinc-500 font-bold">Wolne środki:</Text>
-              <Text className="text-[#F59E0B] font-extrabold text-2xl">${safeToSpend.toLocaleString()}</Text>
+              <Text className="text-[#F59E0B] font-extrabold text-2xl">{symbol}{safeToSpend.toLocaleString()}</Text>
             </View>
           </View>
         </View>
@@ -135,7 +136,7 @@ export default function DashboardScreen() {
                   </Text>
                 </View>
                 <Text className={`font-bold ${item.isPaid ? 'text-zinc-500 line-through' : 'text-yellow-500'}`}>
-                  ${item.amount.toLocaleString()}
+                  {symbol}{item.amount.toLocaleString()}
                 </Text>
               </TouchableOpacity>
             ))
@@ -166,7 +167,7 @@ export default function DashboardScreen() {
                     </View>
                   </View>
                   <Text className="text-zinc-400 text-xs font-medium mb-1" numberOfLines={1}>{item.name}</Text>
-                  <Text className="text-white text-xl font-bold">${item.balance.toLocaleString()}</Text>
+                  <Text className="text-white text-xl font-bold">{symbol}{item.balance.toLocaleString()}</Text>
                 </View>
               )}
             />

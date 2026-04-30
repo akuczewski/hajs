@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { LayoutDashboard, ArrowRightLeft, PiggyBank } from 'lucide-react-native';
+import { LayoutDashboard, ArrowRightLeft, PiggyBank, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -36,6 +36,13 @@ export default function TabLayout() {
         options={{
           title: 'Savings',
           tabBarIcon: ({ color }) => <PiggyBank size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
         }}
       />
     </Tabs>

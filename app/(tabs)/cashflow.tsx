@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Briefcase, Activity, CheckCircle, Plus, Trash2 } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
-import { useBudgetStore } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
 
 export default function CashflowScreen() {
-  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, toggleFixedExpensePayment, deleteIncome, deleteFixedExpense, deleteLiability } = useBudgetStore();
+  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, toggleFixedExpensePayment, deleteIncome, deleteFixedExpense, deleteLiability, currency } = useBudgetStore();
+  const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'INCOMES' | 'EXPENSES'>('INCOMES');
   
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -114,7 +115,7 @@ export default function CashflowScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">Total Monthly Income</Text>
-              <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">${totalIncome.toLocaleString()}</Text>
+              <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">{symbol}{totalIncome.toLocaleString()}</Text>
             </View>
 
             <TouchableOpacity 
@@ -137,7 +138,7 @@ export default function CashflowScreen() {
                   onChangeText={setIncName}
                 />
                 <TextInput
-                  placeholder="Amount ($)"
+                  placeholder={`Amount (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-4"
@@ -171,7 +172,7 @@ export default function CashflowScreen() {
                   <Text className="text-white font-bold text-lg ml-3">{inc.name}</Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Text className="text-white font-bold text-lg mr-3">${inc.amount.toLocaleString()}</Text>
+                  <Text className="text-white font-bold text-lg mr-3">{symbol}{inc.amount.toLocaleString()}</Text>
                   <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="ml-2 bg-[#262A2E] p-2 rounded-lg">
                     <Trash2 color="#EF4444" size={18} />
                   </TouchableOpacity>
@@ -188,7 +189,7 @@ export default function CashflowScreen() {
                     <Activity color="#10B981" size={20} />
                     <Text className="text-white font-bold text-lg ml-2">{inc.name}</Text>
                   </View>
-                  <Text className="text-white font-bold text-lg">${inc.amount.toLocaleString()}</Text>
+                  <Text className="text-white font-bold text-lg">{symbol}{inc.amount.toLocaleString()}</Text>
                 </View>
                 
                 <View className="flex-row justify-between items-end">
@@ -200,7 +201,7 @@ export default function CashflowScreen() {
                   </View>
                   <View className="items-end mr-12">
                     <Text className="text-zinc-400 text-xs font-medium">Calculated Average</Text>
-                    <Text className="text-[#34D399] font-bold text-lg">${inc.amount}/mo</Text>
+                    <Text className="text-[#34D399] font-bold text-lg">{symbol}{inc.amount}/mo</Text>
                   </View>
                 </View>
 
@@ -220,7 +221,7 @@ export default function CashflowScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">Total Monthly Expenses & Subs</Text>
-              <Text className="text-yellow-500 text-5xl font-extrabold tracking-tighter">${totalExpenses.toLocaleString()}</Text>
+              <Text className="text-yellow-500 text-5xl font-extrabold tracking-tighter">{symbol}{totalExpenses.toLocaleString()}</Text>
             </View>
 
             <TouchableOpacity 
@@ -265,7 +266,7 @@ export default function CashflowScreen() {
                   onChangeText={setExpName}
                 />
                 <TextInput
-                  placeholder="Monthly Amount ($)"
+                  placeholder={`Monthly Amount (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-3"
@@ -339,7 +340,7 @@ export default function CashflowScreen() {
                     </View>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-white font-bold text-lg mr-4">${sub.monthlyPayment}</Text>
+                    <Text className="text-white font-bold text-lg mr-4">{symbol}{sub.monthlyPayment}</Text>
                     <TouchableOpacity 
                       onPress={() => toggleLiabilityPayment(sub.id, currentMonth)}
                       className={`w-12 h-6 rounded-full justify-center px-1 mr-3 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
@@ -371,7 +372,7 @@ export default function CashflowScreen() {
                     </View>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-white font-bold text-lg mr-4">-${exp.amount.toLocaleString()}</Text>
+                    <Text className="text-white font-bold text-lg mr-4">-{symbol}{exp.amount.toLocaleString()}</Text>
                     <TouchableOpacity 
                       onPress={() => toggleFixedExpensePayment(exp.id, currentMonth)}
                       className={`w-12 h-6 rounded-full justify-center px-1 mr-3 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
