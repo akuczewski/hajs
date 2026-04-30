@@ -1,98 +1,93 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { useBudgetStore } from '../../store/useBudgetStore';
+import { Wallet, TrendingUp, CreditCard, PieChart } from 'lucide-react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function DashboardScreen() {
+  const { accounts, incomes, fixedExpenses } = useBudgetStore();
 
-export default function HomeScreen() {
+  const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
+  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalFixed = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const safeToSpend = totalIncome - totalFixed;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView className="flex-1 bg-zinc-950">
+      <ScrollView className="flex-1 px-5 pt-8">
+        
+        {/* Header - Net Worth */}
+        <View className="mb-8 items-center mt-4">
+          <Text className="text-zinc-400 text-sm font-medium uppercase tracking-widest mb-2">Twój Majątek Netto</Text>
+          <Text className="text-white text-5xl font-bold tracking-tighter">
+            {totalNetWorth.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} <Text className="text-2xl text-blue-400">PLN</Text>
+          </Text>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Szybkie Akcje */}
+        <View className="flex-row gap-3 mb-8">
+          <TouchableOpacity className="flex-1 bg-blue-600/20 border border-blue-500/30 rounded-2xl py-4 items-center flex-row justify-center space-x-2">
+            <TrendingUp size={20} color="#60A5FA" />
+            <Text className="text-blue-400 font-semibold ml-2">Przychód</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="flex-1 bg-zinc-800/50 border border-zinc-700/50 rounded-2xl py-4 items-center flex-row justify-center space-x-2">
+            <CreditCard size={20} color="#A1A1AA" />
+            <Text className="text-zinc-300 font-semibold ml-2">Wydatek</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Zero Based Budgeting Summary */}
+        <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 mb-8">
+          <View className="flex-row items-center mb-6">
+            <PieChart size={24} color="#C084FC" />
+            <Text className="text-white text-xl font-bold ml-3">Budżet na ten miesiąc</Text>
+          </View>
+          
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="text-zinc-400 text-base">Przewidywane Przychody</Text>
+            <Text className="text-emerald-400 font-bold text-lg">+{totalIncome.toLocaleString()} PLN</Text>
+          </View>
+          
+          <View className="flex-row justify-between items-center mb-5">
+            <Text className="text-zinc-400 text-base">Wydatki & Zobowiązania</Text>
+            <Text className="text-rose-400 font-bold text-lg">-{totalFixed.toLocaleString()} PLN</Text>
+          </View>
+
+          <View className="h-px bg-zinc-800 w-full mb-5" />
+
+          <View className="flex-row justify-between items-end">
+            <View>
+              <Text className="text-white font-semibold text-lg">Do odłożenia</Text>
+              <Text className="text-zinc-500 text-xs mt-1">Pay yourself first</Text>
+            </View>
+            <Text className="text-purple-400 text-3xl font-black">{safeToSpend.toLocaleString()} PLN</Text>
+          </View>
+        </View>
+
+        {/* Konta */}
+        <View className="mb-4 flex-row items-center justify-between">
+          <Text className="text-white text-xl font-bold">Moje Konta</Text>
+          <TouchableOpacity>
+            <Text className="text-blue-400 font-medium">Dodaj</Text>
+          </TouchableOpacity>
+        </View>
+
+        {accounts.map(acc => (
+          <TouchableOpacity key={acc.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-3 flex-row justify-between items-center">
+            <View className="flex-row items-center">
+              <View className="bg-zinc-800 p-3 rounded-xl mr-4">
+                <Wallet size={24} color="#A1A1AA" />
+              </View>
+              <View>
+                <Text className="text-white font-bold text-lg">{acc.name}</Text>
+                <Text className="text-zinc-500 text-xs font-medium uppercase tracking-wider">{acc.type}</Text>
+              </View>
+            </View>
+            <Text className="text-white font-black text-lg">{acc.balance.toLocaleString('pl-PL')} <Text className="text-zinc-500 text-sm">{acc.currency}</Text></Text>
+          </TouchableOpacity>
+        ))}
+        
+        <View className="h-10" />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
