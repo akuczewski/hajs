@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Briefcase, Activity, CheckCircle, Plus, CreditCard, Receipt, Smartphone } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { Briefcase, Activity, CheckCircle, Plus } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useBudgetStore } from '../../store/useBudgetStore';
 
@@ -73,7 +72,7 @@ export default function CashflowScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#111315]" edges={['top']}>
+    <View className="flex-1 bg-[#111315] pt-12">
       <View className="px-5 py-4 border-b border-zinc-800">
         <Text className="text-white text-2xl font-bold mb-4">Cashflow</Text>
         
@@ -271,7 +270,7 @@ export default function CashflowScreen() {
                 <View key={sub.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-4 mb-3 flex-row justify-between items-center">
                   <View className="flex-row items-center flex-1">
                     <View className="bg-[#262A2E] p-2 rounded-xl mr-4">
-                      <Receipt color="#8B5CF6" size={24} />
+                      <Briefcase color="#8B5CF6" size={24} />
                     </View>
                     <View>
                       <Text className="text-white font-bold text-lg">{sub.name}</Text>
@@ -280,11 +279,12 @@ export default function CashflowScreen() {
                   </View>
                   <View className="flex-row items-center">
                     <Text className="text-white font-bold text-lg mr-4">${sub.monthlyPayment}</Text>
-                    <Switch
-                      value={isPaidThisMonth}
-                      onValueChange={() => toggleLiabilityPayment(sub.id, currentMonth)}
-                      trackColor={{ false: '#3F3F46', true: '#10B981' }}
-                    />
+                    <TouchableOpacity 
+                      onPress={() => toggleLiabilityPayment(sub.id, currentMonth)}
+                      className={`w-12 h-6 rounded-full justify-center px-1 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
+                    >
+                      <View className={`w-4 h-4 rounded-full bg-white ${isPaidThisMonth ? 'self-end' : 'self-start'}`} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               );
@@ -298,7 +298,7 @@ export default function CashflowScreen() {
             {fixedExpenses.map(exp => (
               <View key={exp.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
                 <View className="flex-row items-center">
-                  <CreditCard color="#F87171" size={24} />
+                  <CheckCircle color="#F87171" size={24} />
                   <View className="ml-3">
                     <Text className="text-white font-bold text-lg">{exp.name}</Text>
                     <Text className="text-zinc-500 text-xs uppercase">{exp.category}</Text>
@@ -315,6 +315,6 @@ export default function CashflowScreen() {
 
         <View className="h-10" />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
