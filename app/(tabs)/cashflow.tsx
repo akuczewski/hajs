@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { Briefcase, Activity, CheckCircle, Plus } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Briefcase, Activity, CheckCircle, Plus, Trash2 } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useBudgetStore } from '../../store/useBudgetStore';
 
 export default function CashflowScreen() {
-  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment } = useBudgetStore();
+  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, deleteIncome, deleteFixedExpense, deleteLiability } = useBudgetStore();
   const [activeTab, setActiveTab] = useState<'INCOMES' | 'EXPENSES'>('INCOMES');
   
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -171,7 +171,9 @@ export default function CashflowScreen() {
                 </View>
                 <View className="flex-row items-center">
                   <Text className="text-white font-bold text-lg mr-3">${inc.amount.toLocaleString()}</Text>
-                  <CheckCircle color="#10B981" size={20} />
+                  <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="ml-2 bg-[#262A2E] p-2 rounded-lg">
+                    <Trash2 color="#EF4444" size={18} />
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
@@ -200,6 +202,10 @@ export default function CashflowScreen() {
                     <Text className="text-[#34D399] font-bold text-lg">${inc.amount}/mo</Text>
                   </View>
                 </View>
+
+                <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="absolute top-4 right-4 bg-[#262A2E] p-2 rounded-lg">
+                  <Trash2 color="#EF4444" size={18} />
+                </TouchableOpacity>
 
                 <TouchableOpacity className="absolute bottom-4 right-4 bg-[#34D399] p-3 rounded-full border border-[#059669]">
                   <Plus color="#022C22" size={24} />
@@ -332,9 +338,12 @@ export default function CashflowScreen() {
                     <Text className="text-white font-bold text-lg mr-4">${sub.monthlyPayment}</Text>
                     <TouchableOpacity 
                       onPress={() => toggleLiabilityPayment(sub.id, currentMonth)}
-                      className={`w-12 h-6 rounded-full justify-center px-1 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
+                      className={`w-12 h-6 rounded-full justify-center px-1 mr-3 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
                     >
                       <View className={`w-4 h-4 rounded-full bg-white ${isPaidThisMonth ? 'self-end' : 'self-start'}`} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteLiability(sub.id)} className="bg-[#262A2E] p-2 rounded-lg">
+                      <Trash2 color="#EF4444" size={18} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -356,7 +365,10 @@ export default function CashflowScreen() {
                   </View>
                 </View>
                 <View className="flex-row items-center">
-                  <Text className="text-white font-bold text-lg">-${exp.amount.toLocaleString()}</Text>
+                  <Text className="text-white font-bold text-lg mr-3">-${exp.amount.toLocaleString()}</Text>
+                  <TouchableOpacity onPress={() => deleteFixedExpense(exp.id)} className="bg-[#262A2E] p-2 rounded-lg">
+                    <Trash2 color="#EF4444" size={18} />
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}

@@ -60,5 +60,10 @@ export interface AppState {
   addSinkingFund: (fund: SinkingFund) => void;
   addLiability: (liability: Liability) => void;
   addAccount: (account: Account) => void;
+  
+  deleteIncome: (id: string) => void;
+  deleteFixedExpense: (id: string) => void;
+  deleteLiability: (id: string) => void;
+
   toggleLiabilityPayment: (id: string, month: string) => void;
 }
