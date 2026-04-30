@@ -98,10 +98,10 @@ export default function DashboardScreen() {
         </View>
 
         {/* Monthly Checklist */}
-        <View className="mb-8 pl-5">
-          <View className="flex-row justify-between items-center pr-5 mb-4">
-            <Text className="text-white text-lg font-bold">{t('dashboard.toPayThisMonth')}</Text>
-            <Text className="text-zinc-500 text-xs font-bold">{t('dashboard.markAsPaid')}</Text>
+        <View className="mb-8 px-5">
+          <View className="mb-4">
+            <Text className="text-white text-xl font-bold">{t('dashboard.toPayThisMonth')}</Text>
+            <Text className="text-zinc-500 text-xs mt-1">{t('dashboard.markAsPaid')}</Text>
           </View>
 
           {checklistItems.length === 0 && (
