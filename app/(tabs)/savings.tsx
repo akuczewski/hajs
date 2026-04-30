@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2 } from 'lucide-react-native';
+import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, Circle } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
 import Svg, { Path } from 'react-native-svg';
 
@@ -24,9 +24,10 @@ const iconMap: Record<string, JSX.Element> = {
 };
 
 export default function SavingsScreen() {
-  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, updateAccount, updateSinkingFundBalance, currency } = useBudgetStore();
+  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
+  const currentMonth = new Date().toISOString().slice(0, 7);
   const [activeTab, setActiveTab] = useState<'ASSETS' | 'GOALS'>('ASSETS');
 
   // Edit Assets State
@@ -58,6 +59,7 @@ export default function SavingsScreen() {
       targetAmount: parseFloat(goalTarget),
       deadline: goalDeadline,
       savedAmount: 0,
+      paymentHistory: [],
       createdAt: new Date().toISOString()
     });
     setGoalName('');
@@ -307,10 +309,16 @@ export default function SavingsScreen() {
                       </View>
                     </View>
                     <TouchableOpacity 
-                      onPress={() => updateSinkingFundBalance(fund.id, monthlyRequired)}
-                      className="bg-[#34D399] px-4 py-2 rounded-xl"
+                      onPress={() => toggleSinkingFundPayment(fund.id, currentMonth)}
+                      className="flex-row items-center"
                     >
-                      <Text className="text-[#111315] font-bold text-xs">+ {symbol}{monthlyRequired.toFixed(0)}</Text>
+                      {(fund.paymentHistory || []).includes(currentMonth) ? (
+                        <CheckCircle color="#34D399" size={28} />
+                      ) : (
+                        <View className="bg-[#34D399] px-4 py-2 rounded-xl">
+                          <Text className="text-[#111315] font-bold text-xs">+ {symbol}{monthlyRequired.toFixed(0)}</Text>
+                        </View>
+                      )}
                     </TouchableOpacity>
                   </View>
 

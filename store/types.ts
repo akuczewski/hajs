@@ -25,6 +25,7 @@ export interface SinkingFund {
   targetAmount: number;
   deadline: string; // 'YYYY-MM'
   savedAmount: number;
+  paymentHistory: string[]; // 'YYYY-MM'
   createdAt: string;
 }
 
@@ -74,6 +75,7 @@ export interface AppState {
 
   toggleLiabilityPayment: (id: string, month: string) => void;
   toggleFixedExpensePayment: (id: string, month: string) => void;
+  toggleSinkingFundPayment: (id: string, month: string) => void;
   changeCurrency: (newCurrency: Currency) => void;
   setLanguage: (lang: Language) => void;
   updateAccount: (id: string, updates: Partial<Account>) => void;

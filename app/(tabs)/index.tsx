@@ -17,7 +17,7 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, liabilities, toggleLiabilityPayment, toggleFixedExpensePayment, currency } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
@@ -41,8 +41,15 @@ export default function DashboardScreen() {
       name: lib.name,
       amount: lib.monthlyPayment,
       isPaid: lib.paymentHistory?.includes(currentMonth) || false
+    })),
+    ...sinkingFunds.map(s => ({
+      id: s.id,
+      kind: 'GOAL',
+      name: s.name,
+      amount: s.targetAmount / 12,
+      isPaid: (s.paymentHistory || []).includes(currentMonth)
     }))
-  ];
+  ].sort((a, b) => b.amount - a.amount);
 
   const paidItemsCount = checklistItems.filter(item => item.isPaid).length;
   const totalItemsCount = checklistItems.length;
@@ -121,7 +128,8 @@ export default function DashboardScreen() {
                 key={item.id}
                 onPress={() => {
                   if (item.kind === 'FIXED') toggleFixedExpensePayment(item.id, currentMonth);
-                  else toggleLiabilityPayment(item.id, currentMonth);
+                  else if (item.kind === 'LIABILITY') toggleLiabilityPayment(item.id, currentMonth);
+                  else if (item.kind === 'GOAL') toggleSinkingFundPayment(item.id, currentMonth);
                 }}
                 className={`flex-row items-center justify-between p-4 mb-3 rounded-2xl border ${item.isPaid ? 'bg-[#1C1F22] border-[#272A2E]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
               >

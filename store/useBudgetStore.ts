@@ -78,6 +78,31 @@ export const useBudgetStore = create<AppState>()(
         })
       })),
 
+      toggleSinkingFundPayment: (id, month) => set((state) => ({
+        sinkingFunds: state.sinkingFunds.map(fund => {
+          if (fund.id === id) {
+            const history = fund.paymentHistory || [];
+            const isPaid = history.includes(month);
+            const newHistory = isPaid
+              ? history.filter(m => m !== month)
+              : [...history, month];
+            
+            // Monthly required = (Target - CurrentSavedBeforeToggle) / monthsRemaining
+            // For simplicity in this logic, we use target / 12 as a "standard" contribution
+            // or we can just add/sub the calculated monthly required amount.
+            const monthlyContr = fund.targetAmount / 12; 
+            const adjustment = isPaid ? -monthlyContr : monthlyContr;
+            
+            return { 
+              ...fund, 
+              paymentHistory: newHistory,
+              savedAmount: Math.max(0, fund.savedAmount + adjustment)
+            };
+          }
+          return fund;
+        })
+      })),
+
       changeCurrency: (newCurrency) => set((state) => {
         const oldCurrency = state.currency || 'PLN';
         if (oldCurrency === newCurrency) return state;
