@@ -148,13 +148,13 @@ export default function CashflowScreen() {
                 />
                 <View className="flex-row items-center justify-between bg-[#262A2E] p-4 rounded-xl mb-5">
                   <View>
-                    <Text className="text-white font-medium">{t('cashflow.isFixedIncome')}</Text>
+                    <Text className="text-white font-medium">{t('cashflow.isOneTime')}</Text>
                   </View>
                   <TouchableOpacity 
                     onPress={() => setIncIsFixed(!incIsFixed)}
-                    className={`w-12 h-6 rounded-full justify-center px-1 ${incIsFixed ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
+                    className={`w-12 h-6 rounded-full justify-center px-1 ${!incIsFixed ? 'bg-[#34D399]' : 'bg-[#3F3F46]'}`}
                   >
-                    <View className={`w-4 h-4 rounded-full bg-white ${incIsFixed ? 'self-end' : 'self-start'}`} />
+                    <View className={`w-4 h-4 rounded-full bg-white ${!incIsFixed ? 'self-end' : 'self-start'}`} />
                   </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={handleAddIncome} className="bg-[#34D399] rounded-xl py-4 items-center">
