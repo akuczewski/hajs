@@ -1,22 +1,24 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { useBudgetStore, EXCHANGE_RATES, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
-import { Currency } from '../../store/types';
-import { Settings as SettingsIcon, Globe, Trash2, RefreshCw } from 'lucide-react-native';
+import { Currency, Language } from '../../store/types';
+import { Settings as SettingsIcon, Globe, Trash2, RefreshCw, Languages } from 'lucide-react-native';
+import { useTranslation } from '../../store/i18n';
 
 export default function SettingsScreen() {
-  const { currency, changeCurrency } = useBudgetStore();
+  const { currency, changeCurrency, language, setLanguage } = useBudgetStore();
+  const { t } = useTranslation();
 
   const handleCurrencyChange = (newCurrency: Currency) => {
     if (newCurrency === currency) return;
     
     Alert.alert(
-      "Zmień walutę",
-      `Czy na pewno chcesz zmienić walutę z ${currency} na ${newCurrency}? Wszystkie Twoje środki zostaną przeliczone po kursie.`,
+      t('settings.changeCurrency'),
+      t('settings.changeCurrencyConfirm', { old: currency, new: newCurrency }),
       [
-        { text: "Anuluj", style: "cancel" },
+        { text: t('settings.cancel'), style: "cancel" },
         { 
-          text: "Przelicz", 
+          text: t('settings.convert'), 
           onPress: () => changeCurrency(newCurrency),
           style: "destructive"
         }
@@ -31,17 +33,46 @@ export default function SettingsScreen() {
         {/* Header */}
         <View className="mb-8 flex-row items-center">
           <SettingsIcon color="#3B82F6" size={32} />
-          <Text className="text-white text-3xl font-bold ml-3">Ustawienia</Text>
+          <Text className="text-white text-3xl font-bold ml-3">{t('settings.settings')}</Text>
+        </View>
+
+        {/* Language Settings */}
+        <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-6">
+          <View className="flex-row items-center mb-4">
+            <Languages color="#3B82F6" size={24} />
+            <Text className="text-white text-xl font-bold ml-3">{t('settings.language')}</Text>
+          </View>
+          <Text className="text-zinc-400 text-sm mb-5">
+            {t('settings.languageDesc')}
+          </Text>
+
+          <View className="flex-row flex-wrap gap-3">
+            <TouchableOpacity
+              onPress={() => setLanguage('en')}
+              className={`py-3 px-5 rounded-xl border flex-row items-center ${language === 'en' ? 'bg-[#3B82F6]/20 border-[#3B82F6]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
+              style={language === 'en' ? { backgroundColor: 'rgba(59, 130, 246, 0.2)' } : undefined}
+            >
+              <Text className={`font-bold ${language === 'en' ? 'text-[#3B82F6]' : 'text-zinc-400'}`}>🇬🇧 English</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={() => setLanguage('pl')}
+              className={`py-3 px-5 rounded-xl border flex-row items-center ${language === 'pl' ? 'bg-[#3B82F6]/20 border-[#3B82F6]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
+              style={language === 'pl' ? { backgroundColor: 'rgba(59, 130, 246, 0.2)' } : undefined}
+            >
+              <Text className={`font-bold ${language === 'pl' ? 'text-[#3B82F6]' : 'text-zinc-400'}`}>🇵🇱 Polski</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Currency Settings */}
         <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-6">
           <View className="flex-row items-center mb-4">
             <Globe color="#3B82F6" size={24} />
-            <Text className="text-white text-xl font-bold ml-3">Waluta i Region</Text>
+            <Text className="text-white text-xl font-bold ml-3">{t('settings.currencyRegion')}</Text>
           </View>
           <Text className="text-zinc-400 text-sm mb-5">
-            Wybierz główną walutę, w której chcesz prowadzić budżet. Zmiana waluty spowoduje automatyczne przeliczenie całego majątku.
+            {t('settings.currencyDesc')}
           </Text>
 
           <View className="flex-row flex-wrap gap-3">
@@ -67,10 +98,10 @@ export default function SettingsScreen() {
         <View style={{ borderColor: 'rgba(127, 29, 29, 0.5)' }} className="bg-[#1C1F22] border rounded-3xl p-5 mb-8">
           <View className="flex-row items-center mb-4">
             <Trash2 color="#EF4444" size={24} />
-            <Text className="text-white text-xl font-bold ml-3">Niebezpieczna Strefa</Text>
+            <Text className="text-white text-xl font-bold ml-3">{t('settings.dangerZone')}</Text>
           </View>
           <Text className="text-zinc-400 text-sm mb-5">
-            Usunięcie danych spowoduje nieodwracalną utratę historii transakcji i wszystkich kont.
+            {t('settings.dangerDesc')}
           </Text>
 
           <TouchableOpacity 
@@ -78,7 +109,7 @@ export default function SettingsScreen() {
             className="border py-4 rounded-xl items-center flex-row justify-center"
           >
             <RefreshCw color="#EF4444" size={20} />
-            <Text className="text-red-500 font-bold ml-2">Wyczyść wszystkie dane (Reset)</Text>
+            <Text className="text-red-500 font-bold ml-2">{t('settings.resetApp')}</Text>
           </TouchableOpacity>
         </View>
 

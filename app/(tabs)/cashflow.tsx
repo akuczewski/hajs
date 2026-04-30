@@ -3,9 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'reac
 import { Briefcase, Activity, CheckCircle, Plus, Trash2 } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
+import { useTranslation } from '../../store/i18n';
 
 export default function CashflowScreen() {
   const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, toggleFixedExpensePayment, deleteIncome, deleteFixedExpense, deleteLiability, currency } = useBudgetStore();
+  const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'INCOMES' | 'EXPENSES'>('INCOMES');
   
@@ -96,15 +98,15 @@ export default function CashflowScreen() {
         <View className="flex-row bg-[#1C1F22] rounded-xl p-1 border border-[#272A2E]">
           <TouchableOpacity 
             onPress={() => setActiveTab('INCOMES')}
-            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'INCOMES' ? 'bg-[#262A2E]' : ''}`}
+            className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'INCOMES' ? 'bg-[#3B82F6]' : 'bg-[#1C1F22]'}`}
           >
-            <Text className={`font-bold ${activeTab === 'INCOMES' ? 'text-[#34D399]' : 'text-zinc-500'}`}>INCOMES</Text>
+            <Text className={`font-bold ${activeTab === 'INCOMES' ? 'text-white' : 'text-zinc-500'}`}>{t('cashflow.incomesTab')}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setActiveTab('EXPENSES')}
-            className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'EXPENSES' ? 'bg-[#262A2E]' : ''}`}
+            className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'EXPENSES' ? 'bg-[#3B82F6]' : 'bg-[#1C1F22]'}`}
           >
-            <Text className={`font-bold ${activeTab === 'EXPENSES' ? 'text-yellow-500' : 'text-zinc-500'}`}>EXPENSES</Text>
+            <Text className={`font-bold ${activeTab === 'EXPENSES' ? 'text-white' : 'text-zinc-500'}`}>{t('cashflow.expensesTab')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -114,31 +116,30 @@ export default function CashflowScreen() {
         {activeTab === 'INCOMES' && (
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
-              <Text className="text-zinc-400 font-medium mb-2">Total Monthly Income</Text>
+              <Text className="text-zinc-400 font-medium mb-2">{t('cashflow.totalMonthlyIncome')}</Text>
               <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">{symbol}{totalIncome.toLocaleString()}</Text>
             </View>
 
             <TouchableOpacity 
               onPress={() => setIsAddingIncome(!isAddingIncome)}
-              style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
-              className="border border-[#10B981] rounded-2xl py-4 flex-row justify-center items-center mb-6"
+              className="bg-[#1C1F22] border border-dashed border-zinc-700 py-4 rounded-2xl items-center flex-row justify-center mb-6"
             >
-              <Plus color="#10B981" size={20} />
-              <Text className="text-[#10B981] font-bold ml-2">Add Income Source</Text>
+              <Plus color="#34D399" size={20} />
+              <Text className="text-[#34D399] font-bold ml-2">{t('cashflow.addIncome')}</Text>
             </TouchableOpacity>
 
             {isAddingIncome && (
-              <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-8">
-                <Text className="text-white font-bold mb-4">New Income</Text>
+              <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-6">
+                <Text className="text-white text-xl font-bold mb-4">{t('cashflow.newIncome')}</Text>
                 <TextInput
-                  placeholder="Source Name (e.g. Salary, Upwork)"
+                  placeholder={t('cashflow.incomeName')}
                   placeholderTextColor="#71717A"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-3"
                   value={incName}
                   onChangeText={setIncName}
                 />
                 <TextInput
-                  placeholder={`Amount (${symbol})`}
+                  placeholder={`${t('cashflow.amount')} (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-4"
@@ -147,8 +148,7 @@ export default function CashflowScreen() {
                 />
                 <View className="flex-row items-center justify-between bg-[#262A2E] p-4 rounded-xl mb-5">
                   <View>
-                    <Text className="text-white font-medium">Is this a Fixed Income?</Text>
-                    <Text className="text-zinc-500 text-xs mt-1">Variable incomes use 5-month avg.</Text>
+                    <Text className="text-white font-medium">{t('cashflow.isFixedIncome')}</Text>
                   </View>
                   <TouchableOpacity 
                     onPress={() => setIncIsFixed(!incIsFixed)}
@@ -157,14 +157,14 @@ export default function CashflowScreen() {
                     <View className={`w-4 h-4 rounded-full bg-white ${incIsFixed ? 'self-end' : 'self-start'}`} />
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={handleAddIncome} className="bg-[#10B981] rounded-xl py-4 items-center">
-                  <Text className="text-[#022C22] font-bold text-lg">Save Income</Text>
+                <TouchableOpacity onPress={handleAddIncome} className="bg-[#34D399] rounded-xl py-4 items-center">
+                  <Text className="text-[#022C22] font-bold text-lg">{t('cashflow.saveIncome')}</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-3 px-1">Fixed Income (Salary)</Text>
-            {fixedIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">No fixed incomes added.</Text>}
+            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-3 px-1">{t('cashflow.fixedIncome')}</Text>
+            {fixedIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noFixedIncomes')}</Text>}
             {fixedIncomes.map(inc => (
               <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
                 <View className="flex-row items-center">
@@ -180,8 +180,8 @@ export default function CashflowScreen() {
               </View>
             ))}
 
-            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-4 mb-3 px-1">Variable Income</Text>
-            {variableIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">No variable incomes added.</Text>}
+            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-4 mb-3 px-1">{t('cashflow.variableIncome')}</Text>
+            {variableIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noVariableIncomes')}</Text>}
             {variableIncomes.map(inc => (
               <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 relative overflow-hidden">
                 <View className="flex-row justify-between items-center mb-4">
@@ -197,20 +197,16 @@ export default function CashflowScreen() {
                     <Svg height="100%" width="100%" viewBox="0 0 100 40" preserveAspectRatio="none">
                       <Path d="M0 30 L 20 10 L 40 35 L 60 5 L 80 20 L 100 0" fill="none" stroke="#34D399" strokeWidth="2" />
                     </Svg>
-                    <Text className="text-zinc-600 text-[10px] mt-1">Last 5 Months</Text>
+                    <Text className="text-zinc-600 text-[10px] mt-1">{t('cashflow.last5Months')}</Text>
                   </View>
                   <View className="items-end mr-12">
-                    <Text className="text-zinc-400 text-xs font-medium">Calculated Average</Text>
+                    <Text className="text-zinc-400 text-xs font-medium">{t('cashflow.calculatedAverage')}</Text>
                     <Text className="text-[#34D399] font-bold text-lg">{symbol}{inc.amount}/mo</Text>
                   </View>
                 </View>
 
                 <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="absolute top-4 right-4 bg-[#262A2E] p-2 rounded-lg">
                   <Trash2 color="#EF4444" size={18} />
-                </TouchableOpacity>
-
-                <TouchableOpacity className="absolute bottom-4 right-4 bg-[#34D399] p-3 rounded-full border border-[#059669]">
-                  <Plus color="#022C22" size={24} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -220,7 +216,7 @@ export default function CashflowScreen() {
         {activeTab === 'EXPENSES' && (
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
-              <Text className="text-zinc-400 font-medium mb-2">Total Monthly Expenses & Subs</Text>
+              <Text className="text-zinc-400 font-medium mb-2">{t('cashflow.totalMonthlyExpenses')}</Text>
               <Text className="text-yellow-500 text-5xl font-extrabold tracking-tighter">{symbol}{totalExpenses.toLocaleString()}</Text>
             </View>
 
@@ -230,43 +226,43 @@ export default function CashflowScreen() {
               className="border border-yellow-500 rounded-2xl py-4 flex-row justify-center items-center mb-6"
             >
               <Plus color="#EAB308" size={20} />
-              <Text className="text-yellow-500 font-bold ml-2">Add Expense or Sub</Text>
+              <Text className="text-yellow-500 font-bold ml-2">{t('cashflow.addExpense')}</Text>
             </TouchableOpacity>
 
             {isAddingExpense && (
-              <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-8">
-                <Text className="text-white font-bold mb-4">New Expense</Text>
+              <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-6">
+                <Text className="text-white text-xl font-bold mb-4">{t('cashflow.newExpense')}</Text>
                 
                 <View className="flex-row bg-[#262A2E] rounded-lg p-1 mb-4">
                   <TouchableOpacity 
                     onPress={() => setExpType('FIXED')}
                     className={`flex-1 py-2 items-center rounded-md ${expType === 'FIXED' ? 'bg-[#3F3F46]' : ''}`}
                   >
-                    <Text className="text-white text-xs font-bold">Fixed Expense</Text>
+                    <Text className="text-white text-xs font-bold">{t('cashflow.fixed')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     onPress={() => setExpType('SUBSCRIPTION')}
                     className={`flex-1 py-2 items-center rounded-md ${expType === 'SUBSCRIPTION' ? 'bg-[#3F3F46]' : ''}`}
                   >
-                    <Text className="text-white text-xs font-bold">Subscription</Text>
+                    <Text className="text-white text-xs font-bold">{t('cashflow.subscription')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     onPress={() => setExpType('CREDIT')}
                     className={`flex-1 py-2 items-center rounded-md ${expType === 'CREDIT' ? 'bg-[#3F3F46]' : ''}`}
                   >
-                    <Text className="text-white text-xs font-bold">Credit/Loan</Text>
+                    <Text className="text-white text-xs font-bold">{t('cashflow.credit')}</Text>
                   </TouchableOpacity>
                 </View>
 
                 <TextInput
-                  placeholder="Name (e.g. Electricity, Netflix)"
+                  placeholder={t('cashflow.expenseName')}
                   placeholderTextColor="#71717A"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-3"
                   value={expName}
                   onChangeText={setExpName}
                 />
                 <TextInput
-                  placeholder={`Monthly Amount (${symbol})`}
+                  placeholder={`${t('cashflow.monthlyAmount')} (${symbol})`}
                   placeholderTextColor="#71717A"
                   keyboardType="numeric"
                   className="bg-[#262A2E] text-white p-4 rounded-xl mb-3"
@@ -276,7 +272,7 @@ export default function CashflowScreen() {
                 
                 {expType === 'FIXED' && (
                   <TextInput
-                    placeholder="Category (e.g. Taxes, Bills, Car)"
+                    placeholder={t('cashflow.category')}
                     placeholderTextColor="#71717A"
                     className="bg-[#262A2E] text-white p-4 rounded-xl mb-4"
                     value={expCategory}
@@ -286,10 +282,10 @@ export default function CashflowScreen() {
 
                 {expType === 'CREDIT' && (
                   <View className="mb-4">
-                    <Text className="text-zinc-400 text-xs mb-2">Number of months/installments (not cash):</Text>
+                    <Text className="text-zinc-400 text-xs mb-2">{t('cashflow.installmentsInfo')}</Text>
                     <View className="flex-row justify-between">
                       <TextInput
-                        placeholder="Total months (e.g. 24)"
+                        placeholder={t('cashflow.totalMonths')}
                         placeholderTextColor="#71717A"
                         keyboardType="numeric"
                         className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 mr-2"
@@ -297,7 +293,7 @@ export default function CashflowScreen() {
                         onChangeText={setCreditTotalInstallments}
                       />
                       <TextInput
-                        placeholder="Months paid (e.g. 5)"
+                        placeholder={t('cashflow.monthsPaid')}
                         placeholderTextColor="#71717A"
                         keyboardType="numeric"
                         className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 ml-2"
@@ -309,17 +305,16 @@ export default function CashflowScreen() {
                 )}
 
                 <TouchableOpacity onPress={handleAddExpense} className="bg-yellow-500 rounded-xl py-4 items-center mt-2">
-                  <Text className="text-yellow-950 font-bold text-lg">Save Expense</Text>
+                  <Text className="text-yellow-950 font-bold text-lg">{t('cashflow.saveExpense')}</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            {/* Subscriptions / Liabilities */}
             <View className="flex-row justify-between items-end mb-4 px-1">
-              <Text className="text-white font-bold text-lg">Subscriptions & Credits</Text>
-              <Text className="text-zinc-500 text-xs font-medium">Paid this Month</Text>
+              <Text className="text-white font-bold text-lg">{t('cashflow.subsAndCredits')}</Text>
+              <Text className="text-zinc-500 text-xs font-medium">{t('cashflow.paidThisMonth')}</Text>
             </View>
-            {liabilities.length === 0 && <Text className="text-zinc-500 mb-6">No subscriptions or credits added.</Text>}
+            {liabilities.length === 0 && <Text className="text-zinc-500 mb-6">{t('cashflow.noSubs')}</Text>}
             {liabilities.map(sub => {
               const isPaidThisMonth = sub.paymentHistory.includes(currentMonth);
               return (
@@ -332,10 +327,10 @@ export default function CashflowScreen() {
                       <Text className="text-white font-bold text-lg">{sub.name}</Text>
                       {sub.type === 'CREDIT' && sub.totalInstallments ? (
                         <Text className="text-zinc-500 text-xs">
-                          Paid: {(sub.paidInstallments || 0) + sub.paymentHistory.length} / {sub.totalInstallments} ( {Math.round((((sub.paidInstallments || 0) + sub.paymentHistory.length) / sub.totalInstallments) * 100)}% )
+                          {t('cashflow.paid')}: {(sub.paidInstallments || 0) + sub.paymentHistory.length} / {sub.totalInstallments}
                         </Text>
                       ) : (
-                        <Text className="text-zinc-500 text-xs">Monthly fee</Text>
+                        <Text className="text-zinc-500 text-xs">{t('cashflow.monthlyFee')}</Text>
                       )}
                     </View>
                   </View>
@@ -355,11 +350,10 @@ export default function CashflowScreen() {
               );
             })}
 
-            {/* Fixed Expenses */}
             <View className="flex-row justify-between items-center mt-6 mb-3 px-1">
-              <Text className="text-white font-bold text-lg">Fixed Expenses</Text>
+              <Text className="text-white font-bold text-lg">{t('cashflow.fixedExpenses')}</Text>
             </View>
-            {fixedExpenses.length === 0 && <Text className="text-zinc-600 mb-6 px-1">No fixed expenses added.</Text>}
+            {fixedExpenses.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noFixedExpenses')}</Text>}
             {fixedExpenses.map(exp => {
               const isPaidThisMonth = exp.paymentHistory?.includes(currentMonth);
               return (

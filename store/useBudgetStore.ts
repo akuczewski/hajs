@@ -33,17 +33,23 @@ export const useBudgetStore = create<AppState>()(
         { id: '2', name: 'Gotówka', type: 'CASH', balance: 500, currency: 'PLN', createdAt: new Date().toISOString() }
       ],
       currency: 'PLN',
+      language: 'en',
 
       addIncome: (income) => set((state) => ({ incomes: [...state.incomes, income] })),
-      addFixedExpense: (expense) => set((state) => ({ fixedExpenses: [...state.fixedExpenses, expense] })),
-      addSinkingFund: (fund) => set((state) => ({ sinkingFunds: [...state.sinkingFunds, fund] })),
-      addLiability: (liability) => set((state) => ({ liabilities: [...state.liabilities, liability] })),
-      addAccount: (account) => set((state) => ({ accounts: [...state.accounts, account] })),
-      
       deleteIncome: (id) => set((state) => ({ incomes: state.incomes.filter(i => i.id !== id) })),
+      
+      addFixedExpense: (expense) => set((state) => ({ fixedExpenses: [...state.fixedExpenses, expense] })),
       deleteFixedExpense: (id) => set((state) => ({ fixedExpenses: state.fixedExpenses.filter(e => e.id !== id) })),
+      
+      addSinkingFund: (fund) => set((state) => ({ sinkingFunds: [...state.sinkingFunds, fund] })),
+      
+      addLiability: (liability) => set((state) => ({ liabilities: [...state.liabilities, liability] })),
       deleteLiability: (id) => set((state) => ({ liabilities: state.liabilities.filter(l => l.id !== id) })),
+      
+      addAccount: (account) => set((state) => ({ accounts: [...state.accounts, account] })),
       deleteAccount: (id) => set((state) => ({ accounts: state.accounts.filter(a => a.id !== id) })),
+
+      setLanguage: (lang) => set(() => ({ language: lang })),
       
       toggleLiabilityPayment: (id, month) => set((state) => ({
         liabilities: state.liabilities.map(lib => {
@@ -87,6 +93,14 @@ export const useBudgetStore = create<AppState>()(
           accounts: state.accounts.map(a => ({ ...a, balance: a.balance * multiplier }))
         };
       }),
+
+      updateAccount: (id, updates) => set((state) => ({
+        accounts: state.accounts.map(a => a.id === id ? { ...a, ...updates } : a)
+      })),
+
+      updateSinkingFundBalance: (id, amount) => set((state) => ({
+        sinkingFunds: state.sinkingFunds.map(s => s.id === id ? { ...s, savedAmount: s.savedAmount + amount } : s)
+      }))
     }),
     {
       name: 'budget-storage',

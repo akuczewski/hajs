@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { LayoutDashboard, ArrowRightLeft, PiggyBank, Settings } from 'lucide-react-native';
+import { useTranslation } from '../../store/i18n';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -20,28 +23,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: t('tabs.dashboard'),
           tabBarIcon: ({ color }) => <LayoutDashboard size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="cashflow"
         options={{
-          title: 'Cashflow',
+          title: t('tabs.cashflow'),
           tabBarIcon: ({ color }) => <ArrowRightLeft size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="savings"
         options={{
-          title: 'Savings',
+          title: t('tabs.savings'),
           tabBarIcon: ({ color }) => <PiggyBank size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('tabs.settings'),
           tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
         }}
       />

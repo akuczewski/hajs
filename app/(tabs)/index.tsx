@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
+import { useTranslation } from '../../store/i18n';
 import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
@@ -17,6 +18,7 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 
 export default function DashboardScreen() {
   const { incomes, fixedExpenses, accounts, liabilities, toggleLiabilityPayment, toggleFixedExpensePayment, currency } = useBudgetStore();
+  const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -55,7 +57,7 @@ export default function DashboardScreen() {
         
         {/* Header - Net Worth */}
         <View className="px-5 mb-2">
-          <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">Twoje Całkowite Net Worth</Text>
+          <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">{t('dashboard.netWorth')}</Text>
           <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">
             {symbol}{totalNetWorth.toLocaleString()}
           </Text>
@@ -84,29 +86,27 @@ export default function DashboardScreen() {
         </View>
 
         {/* Action Buttons: Pay Yourself First */}
-        <View className="px-5 mb-8 -mt-2">
-          <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5">
-            <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-white font-bold text-lg">Zapłać sobie najpierw 👑</Text>
-              <Wallet color="#F59E0B" size={24} />
-            </View>
-            <Text className="text-zinc-400 text-sm mb-4">Po opłaceniu wszystkich stałych rachunków, do dyspozycji pozostaje Ci kwota, którą możesz przelać na Sinking Funds.</Text>
+        <View className="px-5 mb-8">
+          <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6">
+            <Text className="text-white text-xl font-bold mb-2">{t('dashboard.payYourselfFirst')}</Text>
+            <Text className="text-zinc-400 text-sm mb-4">{t('dashboard.payYourselfDesc')}</Text>
             <View className="bg-[#111315] p-4 rounded-2xl flex-row justify-between items-center border border-[#272A2E]">
-              <Text className="text-zinc-500 font-bold">Wolne środki:</Text>
+              <Text className="text-zinc-500 font-bold">{t('dashboard.freeFunds')}</Text>
               <Text className="text-[#F59E0B] font-extrabold text-2xl">{symbol}{safeToSpend.toLocaleString()}</Text>
             </View>
           </View>
         </View>
 
         {/* Monthly Checklist */}
-        <View className="px-5 mb-8">
-          <View className="flex-row justify-between items-end mb-4">
-            <View>
-              <Text className="text-white text-xl font-bold mb-1">Do opłacenia w tym miesiącu</Text>
-              <Text className="text-zinc-500 text-xs">Oznacz jako zapłacone, aby mieć spokój.</Text>
-            </View>
-            <Text className="text-[#34D399] font-bold">{paidItemsCount} / {totalItemsCount}</Text>
+        <View className="mb-8 pl-5">
+          <View className="flex-row justify-between items-center pr-5 mb-4">
+            <Text className="text-white text-lg font-bold">{t('dashboard.toPayThisMonth')}</Text>
+            <Text className="text-zinc-500 text-xs font-bold">{t('dashboard.markAsPaid')}</Text>
           </View>
+
+          {checklistItems.length === 0 && (
+             <Text className="text-zinc-500 text-center py-4">{t('dashboard.noBills')}</Text>
+          )}
 
           {/* Progress bar */}
           <View className="h-2 w-full bg-[#1C1F22] rounded-full overflow-hidden mb-5">
@@ -146,9 +146,9 @@ export default function DashboardScreen() {
         {/* Read-Only Accounts Slider */}
         <View className="mb-8 pl-5">
           <View className="flex-row justify-between items-center pr-5 mb-4">
-            <Text className="text-white text-lg font-bold">Twoje Aktywa</Text>
+            <Text className="text-white text-lg font-bold">{t('dashboard.yourAssets')}</Text>
             <TouchableOpacity className="flex-row items-center">
-              <Text className="text-zinc-500 text-xs font-bold mr-1">Więcej</Text>
+              <Text className="text-zinc-500 text-xs font-bold mr-1">{t('dashboard.more')}</Text>
               <ArrowRight color="#71717A" size={14} />
             </TouchableOpacity>
           </View>

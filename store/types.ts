@@ -50,6 +50,7 @@ export interface Account {
 }
 
 export type Currency = 'PLN' | 'USD' | 'EUR' | 'GBP';
+export type Language = 'en' | 'pl';
 
 export interface AppState {
   incomes: Income[];
@@ -58,6 +59,7 @@ export interface AppState {
   liabilities: Liability[];
   accounts: Account[];
   currency: Currency;
+  language: Language;
 
   addIncome: (income: Income) => void;
   addFixedExpense: (expense: FixedExpense) => void;
@@ -73,4 +75,7 @@ export interface AppState {
   toggleLiabilityPayment: (id: string, month: string) => void;
   toggleFixedExpensePayment: (id: string, month: string) => void;
   changeCurrency: (newCurrency: Currency) => void;
+  setLanguage: (lang: Language) => void;
+  updateAccount: (id: string, updates: Partial<Account>) => void;
+  updateSinkingFundBalance: (id: string, amount: number) => void;
 }
