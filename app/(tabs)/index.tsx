@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { useBudgetStore } from '../../store/useBudgetStore';
-import { Wallet, Bitcoin, Landmark, CheckCircle2, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart } from 'lucide-react-native';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
 
@@ -50,7 +50,7 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
-      <ScrollView className="flex-1 pt-6">
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} className="pt-6">
         
         {/* Header - Net Worth */}
         <View className="px-5 mb-2">
@@ -126,7 +126,7 @@ export default function DashboardScreen() {
               >
                 <View className="flex-row items-center">
                   {item.isPaid ? (
-                    <CheckCircle2 color="#34D399" size={24} />
+                    <CheckCircle color="#34D399" size={24} />
                   ) : (
                     <Circle color="#71717A" size={24} />
                   )}
