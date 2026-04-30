@@ -1,4 +1,4 @@
-export type AccountType = 'BANK' | 'CASH' | 'VIRTUAL' | 'CRYPTO' | 'PRECIOUS_METAL';
+export type AccountType = 'CASH' | 'BANK' | 'DEPOSIT' | 'BONDS' | 'STOCKS' | 'CRYPTO' | 'PRECIOUS_METAL';
 export type LiabilityType = 'CREDIT' | 'SUBSCRIPTION';
 
 export interface Income {
@@ -65,6 +65,7 @@ export interface AppState {
   deleteIncome: (id: string) => void;
   deleteFixedExpense: (id: string) => void;
   deleteLiability: (id: string) => void;
+  deleteAccount: (id: string) => void;
 
   toggleLiabilityPayment: (id: string, month: string) => void;
   toggleFixedExpensePayment: (id: string, month: string) => void;

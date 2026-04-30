@@ -30,6 +30,7 @@ export const useBudgetStore = create<AppState>()(
       deleteIncome: (id) => set((state) => ({ incomes: state.incomes.filter(i => i.id !== id) })),
       deleteFixedExpense: (id) => set((state) => ({ fixedExpenses: state.fixedExpenses.filter(e => e.id !== id) })),
       deleteLiability: (id) => set((state) => ({ liabilities: state.liabilities.filter(l => l.id !== id) })),
+      deleteAccount: (id) => set((state) => ({ accounts: state.accounts.filter(a => a.id !== id) })),
       
       toggleLiabilityPayment: (id, month) => set((state) => ({
         liabilities: state.liabilities.map(lib => {
