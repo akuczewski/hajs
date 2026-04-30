@@ -19,8 +19,10 @@ export default function CashflowScreen() {
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [expName, setExpName] = useState('');
   const [expAmount, setExpAmount] = useState('');
-  const [expType, setExpType] = useState<'FIXED' | 'SUBSCRIPTION'>('FIXED');
+  const [expType, setExpType] = useState<'FIXED' | 'SUBSCRIPTION' | 'CREDIT'>('FIXED');
   const [expCategory, setExpCategory] = useState('');
+  const [creditTotalInstallments, setCreditTotalInstallments] = useState('');
+  const [creditPaidInstallments, setCreditPaidInstallments] = useState('');
 
   // Computations
   const fixedIncomes = incomes.filter(i => i.isFixed);
@@ -55,7 +57,7 @@ export default function CashflowScreen() {
         category: expCategory || 'Inne',
         createdAt: new Date().toISOString()
       });
-    } else {
+    } else if (expType === 'SUBSCRIPTION') {
       addLiability({
         id: Date.now().toString(),
         name: expName,
@@ -64,10 +66,23 @@ export default function CashflowScreen() {
         paymentHistory: [],
         createdAt: new Date().toISOString()
       });
+    } else if (expType === 'CREDIT') {
+      addLiability({
+        id: Date.now().toString(),
+        name: expName,
+        type: 'CREDIT',
+        monthlyPayment: parseFloat(expAmount),
+        totalInstallments: parseInt(creditTotalInstallments) || undefined,
+        paidInstallments: parseInt(creditPaidInstallments) || 0,
+        paymentHistory: [],
+        createdAt: new Date().toISOString()
+      });
     }
     setExpName('');
     setExpAmount('');
     setExpCategory('');
+    setCreditTotalInstallments('');
+    setCreditPaidInstallments('');
     setIsAddingExpense(false);
   };
 
@@ -225,7 +240,13 @@ export default function CashflowScreen() {
                     onPress={() => setExpType('SUBSCRIPTION')}
                     className={`flex-1 py-2 items-center rounded-md ${expType === 'SUBSCRIPTION' ? 'bg-[#3F3F46]' : ''}`}
                   >
-                    <Text className="text-white text-xs font-bold">Subscription/Credit</Text>
+                    <Text className="text-white text-xs font-bold">Subscription</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    onPress={() => setExpType('CREDIT')}
+                    className={`flex-1 py-2 items-center rounded-md ${expType === 'CREDIT' ? 'bg-[#3F3F46]' : ''}`}
+                  >
+                    <Text className="text-white text-xs font-bold">Credit/Loan</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -255,6 +276,27 @@ export default function CashflowScreen() {
                   />
                 )}
 
+                {expType === 'CREDIT' && (
+                  <View className="flex-row justify-between mb-4">
+                    <TextInput
+                      placeholder="Total Installments (e.g. 24)"
+                      placeholderTextColor="#71717A"
+                      keyboardType="numeric"
+                      className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 mr-2"
+                      value={creditTotalInstallments}
+                      onChangeText={setCreditTotalInstallments}
+                    />
+                    <TextInput
+                      placeholder="Already Paid (e.g. 5)"
+                      placeholderTextColor="#71717A"
+                      keyboardType="numeric"
+                      className="bg-[#262A2E] text-white p-4 rounded-xl flex-1 ml-2"
+                      value={creditPaidInstallments}
+                      onChangeText={setCreditPaidInstallments}
+                    />
+                  </View>
+                )}
+
                 <TouchableOpacity onPress={handleAddExpense} className="bg-yellow-500 rounded-xl py-4 items-center mt-2">
                   <Text className="text-yellow-950 font-bold text-lg">Save Expense</Text>
                 </TouchableOpacity>
@@ -263,10 +305,10 @@ export default function CashflowScreen() {
 
             {/* Subscriptions / Liabilities */}
             <View className="flex-row justify-between items-end mb-4 px-1">
-              <Text className="text-white font-bold text-lg">Subscriptions & Debits</Text>
+              <Text className="text-white font-bold text-lg">Subscriptions & Credits</Text>
               <Text className="text-zinc-500 text-xs font-medium">Paid this Month</Text>
             </View>
-            {liabilities.length === 0 && <Text className="text-zinc-500 mb-6">No subscriptions added.</Text>}
+            {liabilities.length === 0 && <Text className="text-zinc-500 mb-6">No subscriptions or credits added.</Text>}
             {liabilities.map(sub => {
               const isPaidThisMonth = sub.paymentHistory.includes(currentMonth);
               return (
@@ -277,7 +319,13 @@ export default function CashflowScreen() {
                     </View>
                     <View>
                       <Text className="text-white font-bold text-lg">{sub.name}</Text>
-                      <Text className="text-zinc-500 text-xs">Monthly fee</Text>
+                      {sub.type === 'CREDIT' && sub.totalInstallments ? (
+                        <Text className="text-zinc-500 text-xs">
+                          Paid: {(sub.paidInstallments || 0) + sub.paymentHistory.length} / {sub.totalInstallments} ( {Math.round((((sub.paidInstallments || 0) + sub.paymentHistory.length) / sub.totalInstallments) * 100)}% )
+                        </Text>
+                      ) : (
+                        <Text className="text-zinc-500 text-xs">Monthly fee</Text>
+                      )}
                     </View>
                   </View>
                   <View className="flex-row items-center">

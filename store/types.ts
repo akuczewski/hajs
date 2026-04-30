@@ -33,6 +33,8 @@ export interface Liability {
   type: LiabilityType;
   monthlyPayment: number;
   totalRemaining?: number; // for credits
+  totalInstallments?: number;
+  paidInstallments?: number;
   paymentHistory: string[]; // 'YYYY-MM'
   createdAt: string;
 }
