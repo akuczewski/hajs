@@ -22,7 +22,7 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, netWorthHistory } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
@@ -138,14 +138,14 @@ export default function DashboardScreen() {
             ? nwData
             : [...nwData, { month: currentMonth, value: totalNetWorth }];
           if (withLive.length < 2) return (
-            <View className="h-28 w-full px-5 -mt-2 justify-end pb-2">
+            <TouchableOpacity onPress={recordNetWorthSnapshot} className="h-28 w-full px-5 -mt-2 justify-end pb-2">
               <Text className="text-zinc-700 text-xs text-center">Update balances regularly to build your Net Worth chart</Text>
-            </View>
+            </TouchableOpacity>
           );
           return (
-            <View className="px-5 -mt-2 mb-2">
+            <TouchableOpacity onPress={recordNetWorthSnapshot} activeOpacity={0.85} className="px-5 -mt-2 mb-2">
               <NWLineChart data={withLive} color="#34D399" height={110} showGradient />
-            </View>
+            </TouchableOpacity>
           );
         })()}
 

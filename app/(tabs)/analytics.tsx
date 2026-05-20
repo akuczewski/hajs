@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS, getTrendData, getForecastData, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import LineChart from '../../components/charts/LineChart';
@@ -7,7 +7,7 @@ import BarChart from '../../components/charts/BarChart';
 import { TrendingUp, TrendingDown, BarChart2, Zap } from 'lucide-react-native';
 
 export default function AnalyticsScreen() {
-  const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory } = useBudgetStore();
+  const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
@@ -84,11 +84,11 @@ export default function AnalyticsScreen() {
           <Text className="text-zinc-500 text-xs mb-4">{t('analytics.last12months')}</Text>
 
           {nwDataWithLive.length < 2 ? (
-            <View className="py-8 items-center">
+            <TouchableOpacity onPress={recordNetWorthSnapshot} className="py-8 items-center">
               <Text className="text-zinc-600 text-sm text-center">{t('analytics.noHistory')}</Text>
-            </View>
+            </TouchableOpacity>
           ) : (
-            <>
+            <TouchableOpacity onPress={recordNetWorthSnapshot} activeOpacity={0.85}>
               <Text className="text-[#34D399] text-2xl font-extrabold mb-3">
                 {symbol}{liveNW.toLocaleString()}
               </Text>
@@ -100,7 +100,7 @@ export default function AnalyticsScreen() {
                 symbol={symbol}
                 formatLabel={getMonthLabel}
               />
-            </>
+            </TouchableOpacity>
           )}
         </View>
 
