@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { useMonthNavigation } from '../../hooks/useMonthNavigation';
-import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays } from 'lucide-react-native';
-import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays, Home, Car } from 'lucide-react-native';
+import NWLineChart from '../../components/charts/LineChart';
 import { AccountType } from '../../store/types';
 
 const accountIconMap: Record<AccountType, JSX.Element> = {
@@ -14,11 +14,13 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
   'CRYPTO': <Bitcoin color="#F59E0B" size={20} />,
   'PRECIOUS_METAL': <Coins color="#EAB308" size={20} />,
   'BONDS': <Wallet color="#9CA3AF" size={20} />,
-  'STOCKS': <LineChart color="#EC4899" size={20} />
+  'STOCKS': <LineChart color="#EC4899" size={20} />,
+  'REAL_ESTATE': <Home color="#34D399" size={20} />,
+  'CAR': <Car color="#60A5FA" size={20} />,
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, netWorthHistory } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
@@ -117,19 +119,25 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* SVG Chart (Decorative) */}
-        <View className="h-32 w-full relative -mt-2">
-          <Svg height="100%" width="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <Defs>
-              <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0" stopColor="#34D399" stopOpacity="0.2" />
-                <Stop offset="1" stopColor="#111315" stopOpacity="0" />
-              </LinearGradient>
-            </Defs>
-            <Path d="M0 60 Q 25 80, 50 40 T 100 30 L 100 100 L 0 100 Z" fill="url(#grad)" />
-            <Path d="M0 60 Q 25 80, 50 40 T 100 30" fill="none" stroke="#34D399" strokeWidth="1.5" />
-          </Svg>
-        </View>
+        {/* Net Worth Timeline */}
+        {(() => {
+          const currentMonth = new Date().toISOString().slice(0, 7);
+          const nwMonths = getMonthRange(currentMonth, 7);
+          const nwData = nwMonths.map(m => ({ month: m, value: netWorthHistory[m] ?? null })).filter(d => d.value !== null) as { month: string; value: number }[];
+          const withLive = nwData.length > 0 && nwData[nwData.length - 1].month === currentMonth
+            ? nwData
+            : [...nwData, { month: currentMonth, value: totalNetWorth }];
+          if (withLive.length < 2) return (
+            <View className="h-28 w-full px-5 -mt-2 justify-end pb-2">
+              <Text className="text-zinc-700 text-xs text-center">Update balances regularly to build your Net Worth chart</Text>
+            </View>
+          );
+          return (
+            <View className="px-5 -mt-2 mb-2">
+              <NWLineChart data={withLive} color="#34D399" height={110} showGradient />
+            </View>
+          );
+        })()}
 
         {/* Pay Yourself First */}
         <View className="px-5 mb-8">

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getSinkingFundBreakEven } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { PiggyBank, Target, Plus, ShieldCheck, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, CalendarDays } from 'lucide-react-native';
+import { PiggyBank, Target, Plus, ShieldCheck, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, CalendarDays, Home, Car } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
 import MonthPickerModal from '../../components/MonthPickerModal';
 
@@ -13,7 +13,9 @@ const ACCOUNT_ICONS: Record<AccountType, any> = {
   'CRYPTO': Bitcoin,
   'PRECIOUS_METAL': Coins,
   'BONDS': Wallet,
-  'STOCKS': LineChart
+  'STOCKS': LineChart,
+  'REAL_ESTATE': Home,
+  'CAR': Car,
 };
 
 export default function SavingsScreen() {
@@ -323,10 +325,42 @@ export default function SavingsScreen() {
                     </View>
                   </View>
 
-                  <View className="flex-row justify-between items-center bg-[#111315] p-3 rounded-xl border border-[#272A2E]">
+                  <View className="flex-row justify-between items-center bg-[#111315] p-3 rounded-xl border border-[#272A2E] mb-2">
                     <Text className="text-zinc-400 text-xs">{t('savings.monthlyToSave')}</Text>
                     <Text className="text-white font-bold">{symbol}{monthlyRequired.toFixed(2)}</Text>
                   </View>
+
+                  {/* Break-even */}
+                  {(() => {
+                    if (fund.savedAmount >= fund.targetAmount) {
+                      return (
+                        <View className="flex-row items-center bg-[#34D399]/10 px-3 py-2 rounded-xl border border-[#34D399]/30">
+                          <CheckCircle color="#34D399" size={14} />
+                          <Text className="text-[#34D399] text-xs font-bold ml-2">Goal reached!</Text>
+                        </View>
+                      );
+                    }
+                    const be = getSinkingFundBreakEven(fund);
+                    const [estY, estM] = be.estimatedDate.split('-');
+                    const months = [
+                      t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
+                      t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
+                      t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec'),
+                    ];
+                    const estLabel = `${months[parseInt(estM) - 1]} ${estY}`;
+                    return (
+                      <View className={`flex-row items-center justify-between px-3 py-2 rounded-xl border ${be.isOnTime ? 'bg-[#34D399]/10 border-[#34D399]/30' : 'bg-red-500/10 border-red-500/30'}`}>
+                        <Text className={`text-xs font-medium ${be.isOnTime ? 'text-[#34D399]' : 'text-red-400'}`}>
+                          {t('analytics.estimatedDone')}: {estLabel}
+                        </Text>
+                        <Text className={`text-xs font-bold ${be.isOnTime ? 'text-[#34D399]' : 'text-red-400'}`}>
+                          {be.isOnTime
+                            ? `+${be.monthsDelta} ${t('analytics.ahead')}`
+                            : `${Math.abs(be.monthsDelta)} ${t('analytics.behindBy')}`}
+                        </Text>
+                      </View>
+                    );
+                  })()}
                 </View>
               );
             })}
