@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { useMonthNavigation } from '../../hooks/useMonthNavigation';
-import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays, Home, Car } from 'lucide-react-native';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays, Home, Car, Settings } from 'lucide-react-native';
 import NWLineChart from '../../components/charts/LineChart';
 import { AccountType } from '../../store/types';
 
@@ -20,6 +21,7 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
+  const router = useRouter();
   const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, netWorthHistory } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
@@ -74,9 +76,17 @@ export default function DashboardScreen() {
     <SafeAreaView className="flex-1 bg-[#111315]">
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} className="pt-6">
 
-        {/* Header - Net Worth */}
+        {/* Header - Net Worth + Settings gear */}
         <View className="px-5 mb-2">
-          <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">{t('dashboard.netWorth')}</Text>
+          <View className="flex-row justify-between items-start">
+            <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">{t('dashboard.netWorth')}</Text>
+            <TouchableOpacity
+              onPress={() => router.push('/settings')}
+              className="bg-[#1C1F22] p-2 rounded-xl border border-[#272A2E]"
+            >
+              <Settings color="#71717A" size={20} />
+            </TouchableOpacity>
+          </View>
           <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">
             {symbol}{totalNetWorth.toLocaleString()}
           </Text>
