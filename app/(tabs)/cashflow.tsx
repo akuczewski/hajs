@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Briefcase, Activity, CheckCircle, Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useBudgetStore, CURRENCY_SYMBOLS, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
@@ -122,7 +122,7 @@ export default function CashflowScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#111315]">
+    <View className="flex-1 bg-[#111315] pt-12">
       <View className="px-5 pt-6 border-b border-zinc-800">
         
         {/* Month Navigation Header */}
@@ -516,6 +516,6 @@ export default function CashflowScreen() {
           }}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
