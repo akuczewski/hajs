@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, Circle, CalendarDays } from 'lucide-react-native';
+import { PiggyBank, Target, Plus, ShieldCheck, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, CalendarDays } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
 import MonthPickerModal from '../../components/MonthPickerModal';
-import Svg, { Path } from 'react-native-svg';
 
 const ACCOUNT_ICONS: Record<AccountType, any> = {
   'BANK': Landmark,
@@ -17,32 +16,22 @@ const ACCOUNT_ICONS: Record<AccountType, any> = {
   'STOCKS': LineChart
 };
 
-const iconMap: Record<string, JSX.Element> = {
-  'Car': <Car color="#10B981" size={24} />,
-  'Shield': <ShieldCheck color="#3B82F6" size={24} />,
-  'Plane': <Plane color="#F59E0B" size={24} />,
-  'Default': <Target color="#8B5CF6" size={24} />
-};
-
 export default function SavingsScreen() {
-  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency, activeMonth } = useBudgetStore();
+  const { sinkingFunds, addSinkingFund, deleteSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency, activeMonth } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'ASSETS' | 'GOALS'>('ASSETS');
 
-  // Edit Assets State
   const [editingAsset, setEditingAsset] = useState<string | null>(null);
   const [editAssetName, setEditAssetName] = useState('');
   const [editAssetBalance, setEditAssetBalance] = useState('');
 
-  // Goals State
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [goalName, setGoalName] = useState('');
   const [goalTarget, setGoalTarget] = useState('');
   const [goalDeadline, setGoalDeadline] = useState('');
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
-  // Assets State
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [assetName, setAssetName] = useState('');
   const [assetAmount, setAssetAmount] = useState('');
@@ -76,7 +65,7 @@ export default function SavingsScreen() {
       name: assetName,
       type: assetType,
       balance: parseFloat(assetAmount),
-      currency: 'PLN',
+      currency,
       createdAt: new Date().toISOString()
     });
     setAssetName('');
@@ -84,34 +73,29 @@ export default function SavingsScreen() {
     setIsAddingAsset(false);
   };
 
-  const calculateMonthly = (targetAmount: number, savedAmount: number, deadline: string) => {
-    const remaining = targetAmount - savedAmount;
-    return remaining > 0 ? remaining / 12 : 0; 
-  };
-
   return (
     <View className="flex-1 bg-[#111315] pt-12">
       <View className="px-5 py-4 border-b border-zinc-800">
-        <Text className="text-white text-2xl font-bold mb-4">Savings & Assets</Text>
-        
+        <Text className="text-white text-2xl font-bold mb-4">{t('savings.title')}</Text>
+
         <View className="flex-row bg-[#1C1F22] rounded-xl p-1 border border-[#272A2E]">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setActiveTab('ASSETS')}
             className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'ASSETS' ? 'bg-[#262A2E]' : ''}`}
           >
-            <Text className={`font-bold ${activeTab === 'ASSETS' ? 'text-[#3B82F6]' : 'text-zinc-500'}`}>ASSETS</Text>
+            <Text className={`font-bold ${activeTab === 'ASSETS' ? 'text-[#3B82F6]' : 'text-zinc-500'}`}>{t('savings.assetsTab')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setActiveTab('GOALS')}
             className={`flex-1 py-3 items-center rounded-lg ${activeTab === 'GOALS' ? 'bg-[#262A2E]' : ''}`}
           >
-            <Text className={`font-bold ${activeTab === 'GOALS' ? 'text-[#34D399]' : 'text-zinc-500'}`}>GOALS</Text>
+            <Text className={`font-bold ${activeTab === 'GOALS' ? 'text-[#34D399]' : 'text-zinc-500'}`}>{t('savings.goalsTab')}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView className="flex-1 px-5 pt-6">
-        
+
         {activeTab === 'ASSETS' && (
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
@@ -119,7 +103,7 @@ export default function SavingsScreen() {
               <Text className="text-[#3B82F6] text-5xl font-extrabold tracking-tighter">{symbol}{totalNetWorth.toLocaleString()}</Text>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setIsAddingAsset(!isAddingAsset)}
               className="bg-[#1C1F22] border border-dashed border-zinc-700 py-4 rounded-2xl items-center flex-row justify-center mb-6"
             >
@@ -145,7 +129,7 @@ export default function SavingsScreen() {
                   value={assetAmount}
                   onChangeText={setAssetAmount}
                 />
-                
+
                 <View className="flex-row flex-wrap gap-2 mb-6">
                   {Object.entries(ACCOUNT_ICONS).map(([type, icon]) => (
                     <TouchableOpacity
@@ -180,7 +164,7 @@ export default function SavingsScreen() {
                 <View className="items-end">
                   <Text className="text-white font-bold text-lg mb-2">{symbol}{acc.balance.toLocaleString()}</Text>
                   <View className="flex-row gap-2">
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       onPress={() => {
                         setEditingAsset(acc.id);
                         setEditAssetName(acc.name);
@@ -201,7 +185,7 @@ export default function SavingsScreen() {
             <Modal visible={!!editingAsset} transparent animationType="fade">
               <View className="flex-1 bg-black/60 justify-center px-6">
                 <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6">
-                  <Text className="text-white text-xl font-bold mb-4">{t('savings.newAsset')}</Text>
+                  <Text className="text-white text-xl font-bold mb-4">{t('savings.editAsset')}</Text>
                   <TextInput
                     placeholder={t('savings.assetName')}
                     placeholderTextColor="#71717A"
@@ -218,13 +202,13 @@ export default function SavingsScreen() {
                     onChangeText={setEditAssetBalance}
                   />
                   <View className="flex-row gap-3">
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       onPress={() => setEditingAsset(null)}
                       className="flex-1 bg-[#262A2E] py-4 rounded-xl items-center"
                     >
                       <Text className="text-white font-bold">{t('settings.cancel')}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       onPress={() => {
                         updateAccount(editingAsset!, { name: editAssetName, balance: parseFloat(editAssetBalance) || 0 });
                         setEditingAsset(null);
@@ -253,7 +237,7 @@ export default function SavingsScreen() {
               </View>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setIsAddingGoal(!isAddingGoal)}
               className="bg-[#1C1F22] border border-dashed border-zinc-700 py-4 rounded-2xl items-center flex-row justify-center mb-6"
             >
@@ -283,7 +267,7 @@ export default function SavingsScreen() {
                   onPress={() => setIsDatePickerVisible(true)}
                   className="bg-[#262A2E] p-4 rounded-xl mb-5 flex-row items-center justify-between"
                 >
-                  <Text className={goalDeadline ? "text-white" : "text-[#71717A]"}>
+                  <Text className={goalDeadline ? 'text-white' : 'text-[#71717A]'}>
                     {goalDeadline || t('savings.deadline')}
                   </Text>
                   <CalendarDays color="#71717A" size={20} />
@@ -302,27 +286,31 @@ export default function SavingsScreen() {
               return (
                 <View key={fund.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-5">
                   <View className="flex-row justify-between items-center mb-4">
-                    <View className="flex-row items-center">
+                    <View className="flex-row items-center flex-1 pr-2">
                       <View className="bg-[#34D399]/10 p-2 rounded-lg mr-3">
                         <Target color="#34D399" size={20} />
                       </View>
-                      <View>
-                        <Text className="text-white font-bold text-lg">{fund.name}</Text>
+                      <View className="flex-1">
+                        <Text className="text-white font-bold text-lg" numberOfLines={1}>{fund.name}</Text>
                         <Text className="text-zinc-500 text-xs">{t('savings.inProgress')}</Text>
                       </View>
                     </View>
-                    <TouchableOpacity 
-                      onPress={() => toggleSinkingFundPayment(fund.id, activeMonth)}
-                      className="flex-row items-center"
-                    >
-                      {(fund.paymentHistory || []).includes(activeMonth) ? (
-                        <CheckCircle color="#34D399" size={28} />
-                      ) : (
-                        <View className="bg-[#34D399] px-4 py-2 rounded-xl">
-                          <Text className="text-[#111315] font-bold text-xs">+ {symbol}{monthlyRequired.toFixed(0)}</Text>
-                        </View>
-                      )}
-                    </TouchableOpacity>
+                    <View className="flex-row items-center gap-2">
+                      <TouchableOpacity
+                        onPress={() => toggleSinkingFundPayment(fund.id, activeMonth)}
+                      >
+                        {(fund.paymentHistory || []).includes(activeMonth) ? (
+                          <CheckCircle color="#34D399" size={28} />
+                        ) : (
+                          <View className="bg-[#34D399] px-4 py-2 rounded-xl">
+                            <Text className="text-[#111315] font-bold text-xs">+ {symbol}{monthlyRequired.toFixed(0)}</Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => deleteSinkingFund(fund.id)} className="bg-[#262A2E] p-2 rounded-xl">
+                        <Trash2 color="#EF4444" size={16} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
 
                   <View className="mb-4">
@@ -344,7 +332,7 @@ export default function SavingsScreen() {
             })}
           </View>
         )}
-        
+
         <View className="h-10" />
       </ScrollView>
 
@@ -353,7 +341,7 @@ export default function SavingsScreen() {
         onClose={() => setIsDatePickerVisible(false)}
         onSelect={setGoalDeadline}
         currentValue={goalDeadline}
-        title={t('savings.deadline')}
+        title={t('savings.selectDeadline')}
       />
     </View>
   );

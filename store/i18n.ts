@@ -54,9 +54,31 @@ export const translations: Translations = {
       addIncome: "Add Income Source",
       addFixedExpense: "Add Fixed Expense",
       addLiability: "Add Credit / Installments",
+      totalMonthlyIncome: "Total Monthly Income",
       monthlyIncomes: "Incomes (Monthly)",
+      fixedIncome: "Fixed Income",
+      noFixedIncomes: "No fixed income sources.",
+      variableIncome: "Variable Income",
+      noVariableIncomes: "No variable income sources.",
+      last5Months: "Last 5 months",
       fixedExpenses: "Fixed Expenses (Monthly)",
+      totalMonthlyExpenses: "Total Monthly Expenses",
       liabilities: "Credits & Installments (Monthly)",
+      addExpense: "Add expense / subscription",
+      fixed: "Fixed",
+      subscription: "Subscription",
+      credit: "Credit",
+      installmentsInfo: "Number of installments/months (not amount):",
+      totalMonths: "Total installments",
+      monthsPaid: "Already paid",
+      subsAndCredits: "Subscriptions & Credits",
+      paidThisMonth: "Paid this month",
+      noSubs: "No subscriptions.",
+      monthlyFee: "Monthly fee",
+      noFixedExpenses: "No fixed expenses.",
+      editAmount: "Edit Amount",
+      saveAmount: "Save override",
+      resetToDefault: "Reset to default",
       calculatedAverage: "Calculated Average",
       paid: "PAID",
       of: "of",
@@ -65,10 +87,11 @@ export const translations: Translations = {
       incomeName: "Income Name (e.g., Salary)",
       amount: "Amount",
       saveIncome: "Save Income",
-      newExpense: "New Fixed Expense",
+      newExpense: "New Expense",
       expenseName: "Expense Name (e.g., Rent, Netflix)",
       monthlyAmount: "Monthly Amount",
       category: "Category",
+      categoryOther: "Other",
       saveExpense: "Save Expense",
       newLiability: "New Credit / Installments",
       liabilityName: "Liability Name (e.g., Car Loan)",
@@ -78,11 +101,13 @@ export const translations: Translations = {
       saveLiability: "Save Liability"
     },
     savings: {
+      title: "Savings & Assets",
       assetsTab: "ASSETS",
       goalsTab: "GOALS",
       totalNetWorth: "Total Net Worth",
       addAsset: "Add New Asset / Account",
       newAsset: "New Asset",
+      editAsset: "Edit Asset",
       assetName: "Name (e.g., mBank, BTC Wallet, 5% Deposit)",
       currentValue: "Current Value",
       saveAsset: "Save Asset",
@@ -114,7 +139,9 @@ export const translations: Translations = {
       changeCurrency: "Change currency",
       changeCurrencyConfirm: "Are you sure you want to change the currency from {old} to {new}? All your funds will be converted according to the exchange rate.",
       cancel: "Cancel",
-      convert: "Convert"
+      convert: "Convert",
+      resetAppConfirm: "Are you sure? This will permanently delete all your data — accounts, incomes, expenses, goals and payment history.",
+      delete: "Delete everything"
     }
   },
   pl: {
@@ -206,14 +233,17 @@ export const translations: Translations = {
       noFixedExpenses: "Brak stałych wydatków.",
       editAmount: "Edytuj Kwotę",
       saveAmount: "Zapisz nadpisanie",
-      resetToDefault: "Przywróć domyślną"
+      resetToDefault: "Przywróć domyślną",
+      categoryOther: "Inne"
     },
     savings: {
+      title: "Oszczędności i Aktywa",
       assetsTab: "AKTYWA",
       goalsTab: "CELE",
       totalNetWorth: "Całkowita Wartość Majątku",
       addAsset: "Dodaj nowe Aktywo / Konto",
       newAsset: "Nowe Aktywo",
+      editAsset: "Edytuj Aktywo",
       assetName: "Nazwa (np. mBank, Portfel BTC, Lokata)",
       currentValue: "Aktualna wartość",
       saveAsset: "Zapisz Aktywo",
@@ -245,7 +275,9 @@ export const translations: Translations = {
       changeCurrency: "Zmień walutę",
       changeCurrencyConfirm: "Czy na pewno chcesz zmienić walutę z {old} na {new}? Wszystkie Twoje środki zostaną przeliczone po kursie.",
       cancel: "Anuluj",
-      convert: "Przelicz"
+      convert: "Przelicz",
+      resetAppConfirm: "Czy na pewno? Ta operacja trwale usunie wszystkie dane — konta, przychody, wydatki, cele i historię płatności.",
+      delete: "Usuń wszystko"
     }
   }
 };

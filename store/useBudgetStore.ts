@@ -52,16 +52,16 @@ export const useBudgetStore = create<AppState>()(
   persist(
     (set, get) => ({
       incomes: [
-        { id: '1', name: 'Wypłata UoP', amount: 8000, isFixed: true, history: [], createdAt: new Date().toISOString() }
+        { id: '1', name: 'Salary', amount: 8000, isFixed: true, createdAt: new Date().toISOString() }
       ],
       fixedExpenses: [
-        { id: '1', name: 'Czynsz', amount: 2500, category: 'Mieszkanie', paymentHistory: [], createdAt: new Date().toISOString() }
+        { id: '1', name: 'Rent', amount: 2500, category: 'Housing', paymentHistory: [], createdAt: new Date().toISOString() }
       ],
       sinkingFunds: [],
       liabilities: [],
       accounts: [
-        { id: '1', name: 'Konto Główne', type: 'BANK', balance: 12500.50, currency: 'PLN', createdAt: new Date().toISOString() },
-        { id: '2', name: 'Gotówka', type: 'CASH', balance: 500, currency: 'PLN', createdAt: new Date().toISOString() }
+        { id: '1', name: 'Main Account', type: 'BANK', balance: 12500.50, currency: 'PLN', createdAt: new Date().toISOString() },
+        { id: '2', name: 'Cash', type: 'CASH', balance: 500, currency: 'PLN', createdAt: new Date().toISOString() }
       ],
       currency: 'PLN',
       language: 'en',
@@ -74,7 +74,8 @@ export const useBudgetStore = create<AppState>()(
       deleteFixedExpense: (id) => set((state) => ({ fixedExpenses: state.fixedExpenses.filter(e => e.id !== id) })),
       
       addSinkingFund: (fund) => set((state) => ({ sinkingFunds: [...state.sinkingFunds, fund] })),
-      
+      deleteSinkingFund: (id) => set((state) => ({ sinkingFunds: state.sinkingFunds.filter(s => s.id !== id) })),
+
       addLiability: (liability) => set((state) => ({ liabilities: [...state.liabilities, liability] })),
       deleteLiability: (id) => set((state) => ({ liabilities: state.liabilities.filter(l => l.id !== id) })),
       
@@ -178,6 +179,15 @@ export const useBudgetStore = create<AppState>()(
 
       updateSinkingFundBalance: (id, amount) => set((state) => ({
         sinkingFunds: state.sinkingFunds.map(s => s.id === id ? { ...s, savedAmount: s.savedAmount + amount } : s)
+      })),
+
+      resetApp: () => set(() => ({
+        incomes: [],
+        fixedExpenses: [],
+        sinkingFunds: [],
+        liabilities: [],
+        accounts: [],
+        activeMonth: new Date().toISOString().slice(0, 7),
       }))
     }),
     {
