@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import Svg, { Rect, Line } from 'react-native-svg';
+import Svg, { Rect, Line, Defs, Pattern } from 'react-native-svg';
 
 interface BarDataPoint {
   month: string;
   income: number;
   expenses: number;
+  isForecast?: boolean;
+  isCurrentMonth?: boolean;
 }
 
 interface BarChartProps {
@@ -46,8 +48,10 @@ export default function BarChart({
     return ['J','F','M','A','M','J','J','A','S','O','N','D'][parseInt(month) - 1];
   };
 
-  // Show label every N bars to avoid crowding
-  const step = data.length > 8 ? 3 : data.length > 5 ? 2 : 1;
+  const step = data.length > 10 ? 3 : data.length > 6 ? 2 : 1;
+
+  // Find where forecast starts for the divider line
+  const forecastStartIdx = data.findIndex(d => d.isForecast);
 
   return (
     <View>
@@ -59,35 +63,59 @@ export default function BarChart({
           stroke="#27272A" strokeWidth="1"
         />
 
+        {/* Vertical divider between history and forecast */}
+        {forecastStartIdx > 0 && (
+          <Line
+            x1={PAD_LEFT + forecastStartIdx * slotW}
+            y1={PAD_TOP}
+            x2={PAD_LEFT + forecastStartIdx * slotW}
+            y2={PAD_TOP + chartH}
+            stroke="#3F3F46"
+            strokeWidth="1"
+            strokeDasharray="3,3"
+          />
+        )}
+
         {data.map((d, i) => {
           const slotX = PAD_LEFT + i * slotW + slotW / 2;
           const incH = toBarH(d.income);
           const expH = toBarH(d.expenses);
           const incX = slotX - gap / 2 - barW;
           const expX = slotX + gap / 2;
+          const opacity = d.isForecast ? 0.38 : d.isCurrentMonth ? 1 : 0.75;
 
           return (
             <React.Fragment key={d.month}>
-              {/* Income bar */}
               <Rect
                 x={incX}
                 y={PAD_TOP + chartH - incH}
                 width={barW}
                 height={Math.max(incH, 1)}
-                fill={incomeColor}
+                fill={d.isForecast ? '#6B7280' : incomeColor}
                 rx="2"
-                opacity="0.9"
+                opacity={opacity}
               />
-              {/* Expense bar */}
               <Rect
                 x={expX}
                 y={PAD_TOP + chartH - expH}
                 width={barW}
                 height={Math.max(expH, 1)}
-                fill={expenseColor}
+                fill={d.isForecast ? '#9CA3AF' : expenseColor}
                 rx="2"
-                opacity="0.9"
+                opacity={opacity}
               />
+              {/* Current month dot indicator */}
+              {d.isCurrentMonth && (
+                <Rect
+                  x={slotX - 2}
+                  y={PAD_TOP + chartH + 4}
+                  width={4}
+                  height={4}
+                  rx="2"
+                  fill="#FFFFFF"
+                  opacity="0.6"
+                />
+              )}
             </React.Fragment>
           );
         })}
@@ -107,7 +135,9 @@ export default function BarChart({
                 transform: [{ translateX: -8 }],
               }}
             >
-              <Text style={{ color: '#52525B', fontSize: 10 }}>{formatM(d.month)}</Text>
+              <Text style={{ color: d.isForecast ? '#6B7280' : '#52525B', fontSize: 10 }}>
+                {formatM(d.month)}
+              </Text>
             </View>
           );
         })}

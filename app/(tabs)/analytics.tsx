@@ -5,6 +5,7 @@ import {
   useBudgetStore, CURRENCY_SYMBOLS,
   getTrendData, getForecastData, getMonthRange,
   getIncomeAmount, getExpenseAmount, getLiabilityAmount, calculateMonthlyRequired,
+  getVariableIncomeProjection,
 } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import LineChart from '../../components/charts/LineChart';
@@ -41,7 +42,23 @@ export default function AnalyticsScreen() {
 
   // Last 12 months trend
   const trendMonths = getMonthRange(currentMonth, 12);
-  const trendData = getTrendData(incomes, fixedExpenses, liabilities, sinkingFunds, trendMonths);
+  const trendData = getTrendData(incomes, fixedExpenses, liabilities, sinkingFunds, trendMonths)
+    .map(d => ({ ...d, isCurrentMonth: d.month === currentMonth }));
+
+  // 3-month forecast bars — same logic as getForecastData but income/expenses split
+  const forecastBarMonths = getMonthRange(currentMonth, 3, 'forward');
+  const forecastBarData = forecastBarMonths.map(month => ({
+    month,
+    income: incomes.reduce((acc, i) =>
+      acc + (i.isFixed ? getIncomeAmount(i, month) : getVariableIncomeProjection(i, currentMonth)), 0),
+    expenses:
+      fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, month), 0) +
+      liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, month), 0) +
+      sinkingFunds.reduce((acc, s) => month <= s.deadline ? acc + calculateMonthlyRequired(s) : acc, 0),
+    isForecast: true as const,
+  }));
+
+  const barChartData = [...trendData, ...forecastBarData];
 
   // Net Worth history data
   const nwMonths = getMonthRange(currentMonth, 12);
@@ -133,7 +150,7 @@ export default function AnalyticsScreen() {
           <Text className="text-zinc-500 text-xs mb-4">{t('analytics.last12months')}</Text>
 
           {/* Legend */}
-          <View className="flex-row gap-4 mb-3">
+          <View className="flex-row gap-4 mb-3 flex-wrap">
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-sm bg-[#34D399] mr-1" />
               <Text className="text-zinc-400 text-xs">{t('analytics.income')}</Text>
@@ -142,9 +159,13 @@ export default function AnalyticsScreen() {
               <View className="w-3 h-3 rounded-sm bg-[#EAB308] mr-1" />
               <Text className="text-zinc-400 text-xs">{t('analytics.expenses')}</Text>
             </View>
+            <View className="flex-row items-center">
+              <View className="w-3 h-3 rounded-sm bg-[#6B7280] mr-1 opacity-50" />
+              <Text className="text-zinc-500 text-xs">{t('analytics.forecast')}</Text>
+            </View>
           </View>
 
-          <BarChart data={trendData} height={140} />
+          <BarChart data={barChartData} height={148} />
 
           {/* Averages */}
           <View className="flex-row gap-3 mt-4">
