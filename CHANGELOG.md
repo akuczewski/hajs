@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-05-20
+
+### Added
+- **Time Machine (Unified Timeline)**: You can now change the active month from the Dashboard and Cashflow screens. The timeline is synced globally.
+- **Monthly Overrides**: Edit specific income or expense amounts for a single month without affecting the base value in other months.
+- **Future Planning Limit**: Restricted forward navigation in the calendar to a maximum of 3 months ahead to keep budgeting focused and realistic.
+
+### Fixed
+- **iOS Layout Issue**: Fixed a bug where `ScrollView` content in the Cashflow tab would collapse to 0 height on iOS devices due to `SafeAreaView` interactions.
+- **Translations**: Corrected the save button label in the Edit Asset modal from "Save Income" to "Save Asset".
+
 ## [1.0.0] - 2024-05-01
 
 ### Added
