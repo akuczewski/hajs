@@ -9,6 +9,20 @@ type Translations = {
 
 export const translations: Translations = {
   en: {
+    months: {
+      jan: "January",
+      feb: "February",
+      mar: "March",
+      apr: "April",
+      may: "May",
+      jun: "June",
+      jul: "July",
+      aug: "August",
+      sep: "September",
+      oct: "October",
+      nov: "November",
+      dec: "December"
+    },
     tabs: {
       dashboard: "Dashboard",
       cashflow: "Cashflow",
@@ -25,7 +39,10 @@ export const translations: Translations = {
       noBills: "No bills to pay this month!",
       yourAssets: "Your Assets",
       more: "More",
-      noAssetsYet: "No assets added yet. Go to the Savings tab."
+      noAssetsYet: "No assets added yet. Go to the Savings tab.",
+      currentMonth: "Current Month",
+      archive: "Archive",
+      backToToday: "Back to today"
     },
     cashflow: {
       incomesTab: "INCOMES",
@@ -80,7 +97,8 @@ export const translations: Translations = {
       noGoals: "No yearly goals. Click + to add a new piggy bank.",
       inProgress: "In progress",
       of: "of",
-      monthlyToSave: "Monthly to save"
+      monthlyToSave: "Monthly to save",
+      selectDeadline: "Select Deadline"
     },
     settings: {
       settings: "Settings",
@@ -98,6 +116,20 @@ export const translations: Translations = {
     }
   },
   pl: {
+    months: {
+      jan: "Styczeń",
+      feb: "Luty",
+      mar: "Marzec",
+      apr: "Kwiecień",
+      may: "Maj",
+      jun: "Czerwiec",
+      jul: "Lipiec",
+      aug: "Sierpień",
+      sep: "Wrzesień",
+      oct: "Październik",
+      nov: "Listopad",
+      dec: "Grudzień"
+    },
     tabs: {
       dashboard: "Pulpit",
       cashflow: "Przepływy",
@@ -114,7 +146,10 @@ export const translations: Translations = {
       noBills: "Brak rachunków w tym miesiącu!",
       yourAssets: "Twoje Aktywa",
       more: "Więcej",
-      noAssetsYet: "Nie dodano jeszcze żadnych aktywów. Przejdź do zakładki Oszczędności."
+      noAssetsYet: "Nie dodano jeszcze żadnych aktywów. Przejdź do zakładki Oszczędności.",
+      currentMonth: "Bieżący",
+      archive: "Historia",
+      backToToday: "Wróć do dzisiaj"
     },
     cashflow: {
       incomesTab: "PRZYCHODY",
@@ -188,7 +223,8 @@ export const translations: Translations = {
       noGoals: "Brak celów rocznych. Kliknij + aby dodać nową skarbonkę.",
       inProgress: "W trakcie",
       of: "z",
-      monthlyToSave: "Odkładaj miesięcznie"
+      monthlyToSave: "Odkładaj miesięcznie",
+      selectDeadline: "Wybierz datę"
     },
     settings: {
       settings: "Ustawienia",

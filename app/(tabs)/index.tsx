@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart } from 'lucide-react-native';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
 
@@ -17,11 +17,37 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, activeMonth, setActiveMonth } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
-  const currentMonth = new Date().toISOString().slice(0, 7);
+  const handlePrevMonth = () => {
+    const [year, month] = activeMonth.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1 - 1, 1);
+    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
+  };
+
+  const handleNextMonth = () => {
+    const [year, month] = activeMonth.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1 + 1, 1);
+    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
+  };
+
+  const handleToday = () => {
+    setActiveMonth(new Date().toISOString().slice(0, 7));
+  };
+  
+  const isCurrentMonth = activeMonth === new Date().toISOString().slice(0, 7);
+
+  const getMonthName = (monthStr: string) => {
+    const num = parseInt(monthStr.split('-')[1]);
+    const months = [
+      t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
+      t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
+      t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec')
+    ];
+    return `${months[num - 1]} ${monthStr.split('-')[0]}`;
+  };
 
   const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
   const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
@@ -33,21 +59,21 @@ export default function DashboardScreen() {
       kind: 'FIXED',
       name: exp.name,
       amount: exp.amount,
-      isPaid: exp.paymentHistory?.includes(currentMonth) || false
+      isPaid: exp.paymentHistory?.includes(activeMonth) || false
     })),
     ...liabilities.map(lib => ({
       id: lib.id,
       kind: 'LIABILITY',
       name: lib.name,
       amount: lib.monthlyPayment,
-      isPaid: lib.paymentHistory?.includes(currentMonth) || false
+      isPaid: lib.paymentHistory?.includes(activeMonth) || false
     })),
     ...sinkingFunds.map(s => ({
       id: s.id,
       kind: 'GOAL',
       name: s.name,
-      amount: s.targetAmount / 12,
-      isPaid: (s.paymentHistory || []).includes(currentMonth)
+      amount: calculateMonthlyRequired(s),
+      isPaid: (s.paymentHistory || []).includes(activeMonth)
     }))
   ].sort((a, b) => b.amount - a.amount);
 
@@ -69,6 +95,41 @@ export default function DashboardScreen() {
             {symbol}{totalNetWorth.toLocaleString()}
           </Text>
         </View>
+
+        {/* Month Navigation Header */}
+        <View className="px-5 mt-2 mb-4 flex-row items-center justify-between">
+          <TouchableOpacity onPress={handlePrevMonth} className="bg-[#1C1F22] p-3 rounded-full border border-[#272A2E]">
+            <ChevronLeft color="#A1A1AA" size={20} />
+          </TouchableOpacity>
+          
+          <View className="bg-[#1C1F22] px-4 py-2 rounded-2xl border border-[#272A2E] flex-row items-center">
+            <CalendarDays color="#34D399" size={16} style={{ marginRight: 8 }} />
+            <Text className="text-white font-bold text-base" style={{ marginRight: 8 }}>{getMonthName(activeMonth)}</Text>
+            {isCurrentMonth ? (
+              <View className="bg-[#34D399]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#34D399] mr-1" />
+                <Text className="text-[#34D399] text-xs font-bold">{t('dashboard.currentMonth')}</Text>
+              </View>
+            ) : (
+              <View className="bg-[#8B5CF6]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#8B5CF6] mr-1" />
+                <Text className="text-[#8B5CF6] text-xs font-bold">{t('dashboard.archive')}</Text>
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity onPress={handleNextMonth} className="bg-[#1C1F22] p-3 rounded-full border border-[#272A2E]">
+            <ChevronRight color="#A1A1AA" size={20} />
+          </TouchableOpacity>
+        </View>
+
+        {!isCurrentMonth && (
+          <View className="px-5 mb-2 items-center">
+             <TouchableOpacity onPress={handleToday} className="bg-[#34D399]/10 px-4 py-2 rounded-full border border-[#34D399]/20">
+               <Text className="text-[#34D399] text-xs font-bold uppercase tracking-widest">{t('dashboard.backToToday')}</Text>
+             </TouchableOpacity>
+          </View>
+        )}
 
         {/* SVG Chart (Decorative) */}
         <View className="h-32 w-full relative -mt-2">
@@ -127,9 +188,9 @@ export default function DashboardScreen() {
               <TouchableOpacity 
                 key={item.id}
                 onPress={() => {
-                  if (item.kind === 'FIXED') toggleFixedExpensePayment(item.id, currentMonth);
-                  else if (item.kind === 'LIABILITY') toggleLiabilityPayment(item.id, currentMonth);
-                  else if (item.kind === 'GOAL') toggleSinkingFundPayment(item.id, currentMonth);
+                  if (item.kind === 'FIXED') toggleFixedExpensePayment(item.id, activeMonth);
+                  else if (item.kind === 'LIABILITY') toggleLiabilityPayment(item.id, activeMonth);
+                  else if (item.kind === 'GOAL') toggleSinkingFundPayment(item.id, activeMonth);
                 }}
                 className={`flex-row items-center justify-between p-4 mb-3 rounded-2xl border ${item.isPaid ? 'bg-[#1C1F22] border-[#272A2E]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
               >

@@ -61,6 +61,7 @@ export interface AppState {
   accounts: Account[];
   currency: Currency;
   language: Language;
+  activeMonth: string;
 
   addIncome: (income: Income) => void;
   addFixedExpense: (expense: FixedExpense) => void;
@@ -78,6 +79,7 @@ export interface AppState {
   toggleSinkingFundPayment: (id: string, month: string) => void;
   changeCurrency: (newCurrency: Currency) => void;
   setLanguage: (lang: Language) => void;
+  setActiveMonth: (month: string) => void;
   updateAccount: (id: string, updates: Partial<Account>) => void;
   updateSinkingFundBalance: (id: string, amount: number) => void;
 }

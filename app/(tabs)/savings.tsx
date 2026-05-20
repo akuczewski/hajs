@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, Circle } from 'lucide-react-native';
+import { PiggyBank, Target, Plus, ShieldCheck, Car, Plane, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, Circle, CalendarDays } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
+import MonthPickerModal from '../../components/MonthPickerModal';
 import Svg, { Path } from 'react-native-svg';
 
 const ACCOUNT_ICONS: Record<AccountType, any> = {
@@ -24,10 +25,9 @@ const iconMap: Record<string, JSX.Element> = {
 };
 
 export default function SavingsScreen() {
-  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency } = useBudgetStore();
+  const { sinkingFunds, addSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency, activeMonth } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
-  const currentMonth = new Date().toISOString().slice(0, 7);
   const [activeTab, setActiveTab] = useState<'ASSETS' | 'GOALS'>('ASSETS');
 
   // Edit Assets State
@@ -40,6 +40,7 @@ export default function SavingsScreen() {
   const [goalName, setGoalName] = useState('');
   const [goalTarget, setGoalTarget] = useState('');
   const [goalDeadline, setGoalDeadline] = useState('');
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
   // Assets State
   const [isAddingAsset, setIsAddingAsset] = useState(false);
@@ -278,13 +279,15 @@ export default function SavingsScreen() {
                   value={goalTarget}
                   onChangeText={setGoalTarget}
                 />
-                <TextInput
-                  placeholder={t('savings.deadline')}
-                  placeholderTextColor="#71717A"
-                  className="bg-[#262A2E] text-white p-4 rounded-xl mb-5"
-                  value={goalDeadline}
-                  onChangeText={setGoalDeadline}
-                />
+                <TouchableOpacity
+                  onPress={() => setIsDatePickerVisible(true)}
+                  className="bg-[#262A2E] p-4 rounded-xl mb-5 flex-row items-center justify-between"
+                >
+                  <Text className={goalDeadline ? "text-white" : "text-[#71717A]"}>
+                    {goalDeadline || t('savings.deadline')}
+                  </Text>
+                  <CalendarDays color="#71717A" size={20} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={handleAddGoal} className="bg-[#34D399] rounded-xl py-4 items-center">
                   <Text className="text-[#111315] font-bold text-lg">{t('savings.saveGoal')}</Text>
                 </TouchableOpacity>
@@ -294,7 +297,7 @@ export default function SavingsScreen() {
             {sinkingFunds.length === 0 && <Text className="text-zinc-600 px-1">{t('savings.noGoals')}</Text>}
             {sinkingFunds.map(fund => {
               const progressPercent = Math.min(100, (fund.savedAmount / fund.targetAmount) * 100);
-              const monthlyRequired = (fund.targetAmount - fund.savedAmount) / 12;
+              const monthlyRequired = calculateMonthlyRequired(fund);
 
               return (
                 <View key={fund.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-5 mb-5">
@@ -309,10 +312,10 @@ export default function SavingsScreen() {
                       </View>
                     </View>
                     <TouchableOpacity 
-                      onPress={() => toggleSinkingFundPayment(fund.id, currentMonth)}
+                      onPress={() => toggleSinkingFundPayment(fund.id, activeMonth)}
                       className="flex-row items-center"
                     >
-                      {(fund.paymentHistory || []).includes(currentMonth) ? (
+                      {(fund.paymentHistory || []).includes(activeMonth) ? (
                         <CheckCircle color="#34D399" size={28} />
                       ) : (
                         <View className="bg-[#34D399] px-4 py-2 rounded-xl">
@@ -344,6 +347,14 @@ export default function SavingsScreen() {
         
         <View className="h-10" />
       </ScrollView>
+
+      <MonthPickerModal
+        visible={isDatePickerVisible}
+        onClose={() => setIsDatePickerVisible(false)}
+        onSelect={setGoalDeadline}
+        currentValue={goalDeadline}
+        title={t('savings.deadline')}
+      />
     </View>
   );
 }

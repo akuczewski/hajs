@@ -17,6 +17,15 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   GBP: '£'
 };
 
+export const calculateMonthlyRequired = (fund: SinkingFund) => {
+  const targetYear = parseInt(fund.deadline.split('-')[0]) || new Date().getFullYear();
+  const targetMonth = parseInt(fund.deadline.split('-')[1]) || new Date().getMonth() + 1;
+  const createdYear = parseInt(fund.createdAt.split('-')[0]) || new Date().getFullYear();
+  const createdMonth = parseInt(fund.createdAt.split('-')[1]) || new Date().getMonth() + 1;
+  const totalMonths = (targetYear - createdYear) * 12 + (targetMonth - createdMonth);
+  return fund.targetAmount / Math.max(1, totalMonths);
+};
+
 export const useBudgetStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -34,6 +43,7 @@ export const useBudgetStore = create<AppState>()(
       ],
       currency: 'PLN',
       language: 'en',
+      activeMonth: new Date().toISOString().slice(0, 7),
 
       addIncome: (income) => set((state) => ({ incomes: [...state.incomes, income] })),
       deleteIncome: (id) => set((state) => ({ incomes: state.incomes.filter(i => i.id !== id) })),
@@ -50,6 +60,7 @@ export const useBudgetStore = create<AppState>()(
       deleteAccount: (id) => set((state) => ({ accounts: state.accounts.filter(a => a.id !== id) })),
 
       setLanguage: (lang) => set(() => ({ language: lang })),
+      setActiveMonth: (month) => set(() => ({ activeMonth: month })),
       
       toggleLiabilityPayment: (id, month) => set((state) => ({
         liabilities: state.liabilities.map(lib => {
@@ -87,10 +98,7 @@ export const useBudgetStore = create<AppState>()(
               ? history.filter(m => m !== month)
               : [...history, month];
             
-            // Monthly required = (Target - CurrentSavedBeforeToggle) / monthsRemaining
-            // For simplicity in this logic, we use target / 12 as a "standard" contribution
-            // or we can just add/sub the calculated monthly required amount.
-            const monthlyContr = fund.targetAmount / 12; 
+            const monthlyContr = calculateMonthlyRequired(fund); 
             const adjustment = isPaid ? -monthlyContr : monthlyContr;
             
             return { 
