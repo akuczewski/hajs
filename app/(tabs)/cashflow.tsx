@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, PanResponder } from 'react-native';
 import { Briefcase, Activity, CheckCircle, Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useBudgetStore, CURRENCY_SYMBOLS, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
@@ -43,6 +43,17 @@ export default function CashflowScreen() {
   const isFutureMonth = activeMonth > currentDateStr;
   
   const isMaxFutureReached = isMaxFutureMonthReached(activeMonth, currentDateStr, 3);
+
+  const swipePanResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10 && Math.abs(g.dy) < 40,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx < -30) {
+        if (!isMaxFutureReached) handleNextMonth();
+      } else if (g.dx > 30) {
+        handlePrevMonth();
+      }
+    },
+  });
 
   const handlePrevMonth = () => {
     const [year, month] = activeMonth.split('-');
@@ -126,8 +137,11 @@ export default function CashflowScreen() {
       <View className="px-5 pt-6 border-b border-zinc-800">
         
         {/* Month Navigation Header */}
-        <View className="mb-4 flex-row items-center justify-between">
-          <View className="bg-[#1C1F22] px-4 py-2 rounded-2xl border border-[#272A2E] flex-row items-center">
+        <View className="mb-4 flex-row items-center justify-center">
+          <View
+            className="bg-[#1C1F22] px-5 py-3 rounded-2xl border border-[#272A2E] flex-row items-center"
+            {...swipePanResponder.panHandlers}
+          >
             <CalendarDays color="#34D399" size={16} style={{ marginRight: 8 }} />
             <Text className="text-white font-bold text-base" style={{ marginRight: 8 }}>{getMonthName(activeMonth)}</Text>
             {isCurrentMonth && (
@@ -148,17 +162,6 @@ export default function CashflowScreen() {
                 <Text className="text-[#3B82F6] text-xs font-bold">{t('dashboard.futureMonth')}</Text>
               </View>
             )}
-          </View>
-          <View className="flex-row items-center space-x-2">
-            <TouchableOpacity onPress={handlePrevMonth} className="bg-[#1C1F22] p-2 rounded-full border border-[#272A2E]">
-              <ChevronLeft color="#A1A1AA" size={20} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={isMaxFutureReached ? undefined : handleNextMonth} 
-              className={`bg-[#1C1F22] p-2 rounded-full border border-[#272A2E] ${isMaxFutureReached ? 'opacity-30' : ''}`}
-            >
-              <ChevronRight color={isMaxFutureReached ? "#52525B" : "#A1A1AA"} size={20} />
-            </TouchableOpacity>
           </View>
         </View>
 

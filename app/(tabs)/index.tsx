@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList, PanResponder } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react-native';
@@ -43,6 +43,17 @@ export default function DashboardScreen() {
   const isFutureMonth = activeMonth > currentDateStr;
   
   const isMaxFutureReached = isMaxFutureMonthReached(activeMonth, currentDateStr, 3);
+
+  const swipePanResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10 && Math.abs(g.dy) < 40,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx < -30) {
+        if (!isMaxFutureReached) handleNextMonth();
+      } else if (g.dx > 30) {
+        handlePrevMonth();
+      }
+    },
+  });
 
   const getMonthName = (monthStr: string) => {
     const num = parseInt(monthStr.split('-')[1]);
@@ -102,12 +113,11 @@ export default function DashboardScreen() {
         </View>
 
         {/* Month Navigation Header */}
-        <View className="px-5 mt-2 mb-4 flex-row items-center justify-between">
-          <TouchableOpacity onPress={handlePrevMonth} className="bg-[#1C1F22] p-3 rounded-full border border-[#272A2E]">
-            <ChevronLeft color="#A1A1AA" size={20} />
-          </TouchableOpacity>
-          
-          <View className="bg-[#1C1F22] px-4 py-2 rounded-2xl border border-[#272A2E] flex-row items-center">
+        <View className="px-5 mt-2 mb-4 flex-row items-center justify-center">
+          <View
+            className="bg-[#1C1F22] px-5 py-3 rounded-2xl border border-[#272A2E] flex-row items-center"
+            {...swipePanResponder.panHandlers}
+          >
             <CalendarDays color="#34D399" size={16} style={{ marginRight: 8 }} />
             <Text className="text-white font-bold text-base" style={{ marginRight: 8 }}>{getMonthName(activeMonth)}</Text>
             {isCurrentMonth && (
@@ -129,10 +139,6 @@ export default function DashboardScreen() {
               </View>
             )}
           </View>
-
-          <TouchableOpacity onPress={handleNextMonth} className="bg-[#1C1F22] p-3 rounded-full border border-[#272A2E]">
-            <ChevronRight color="#A1A1AA" size={20} />
-          </TouchableOpacity>
         </View>
 
         {!isCurrentMonth && (
