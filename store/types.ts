@@ -1,4 +1,4 @@
-export type AccountType = 'CASH' | 'BANK' | 'DEPOSIT' | 'BONDS' | 'STOCKS' | 'CRYPTO' | 'PRECIOUS_METAL';
+export type AccountType = 'CASH' | 'BANK' | 'DEPOSIT' | 'BONDS' | 'STOCKS' | 'CRYPTO' | 'PRECIOUS_METAL' | 'REAL_ESTATE' | 'CAR';
 export type LiabilityType = 'CREDIT' | 'SUBSCRIPTION';
 
 export interface Income {
@@ -35,7 +35,7 @@ export interface Liability {
   name: string;
   type: LiabilityType;
   monthlyPayment: number;
-  totalRemaining?: number; // for credits
+  totalRemaining?: number;
   totalInstallments?: number;
   paidInstallments?: number;
   paymentHistory: string[]; // 'YYYY-MM'
@@ -64,7 +64,12 @@ export interface AppState {
   currency: Currency;
   language: Language;
   activeMonth: string;
+  netWorthHistory: Record<string, number>; // 'YYYY-MM' -> net worth value
+  incomeOrder: string[];
+  expenseOrder: string[];
+  liabilityOrder: string[];
 
+  // CRUD
   addIncome: (income: Income) => void;
   addFixedExpense: (expense: FixedExpense) => void;
   addSinkingFund: (fund: SinkingFund) => void;
@@ -77,14 +82,32 @@ export interface AppState {
   deleteLiability: (id: string) => void;
   deleteAccount: (id: string) => void;
 
+  updateIncome: (id: string, updates: Partial<Omit<Income, 'id' | 'createdAt'>>) => void;
+  updateFixedExpense: (id: string, updates: Partial<Omit<FixedExpense, 'id' | 'createdAt'>>) => void;
+  updateLiability: (id: string, updates: Partial<Omit<Liability, 'id' | 'createdAt'>>) => void;
+
+  // Reorder
+  reorderIncome: (fromIndex: number, toIndex: number) => void;
+  reorderExpense: (fromIndex: number, toIndex: number) => void;
+  reorderLiability: (fromIndex: number, toIndex: number) => void;
+
+  // Payments & overrides
   toggleLiabilityPayment: (id: string, month: string) => void;
   toggleFixedExpensePayment: (id: string, month: string) => void;
   toggleSinkingFundPayment: (id: string, month: string) => void;
   setAmountOverride: (type: 'INCOME' | 'FIXED_EXPENSE' | 'LIABILITY', id: string, month: string, amount: number | null) => void;
+
+  // Settings
   changeCurrency: (newCurrency: Currency) => void;
   setLanguage: (lang: Language) => void;
   setActiveMonth: (month: string) => void;
+
+  // Accounts
   updateAccount: (id: string, updates: Partial<Account>) => void;
   updateSinkingFundBalance: (id: string, amount: number) => void;
+
+  // Analytics
+  recordNetWorthSnapshot: () => void;
+
   resetApp: () => void;
 }

@@ -27,7 +27,26 @@ export const translations: Translations = {
       dashboard: "Dashboard",
       cashflow: "Cashflow",
       savings: "Savings",
-      settings: "Settings"
+      settings: "Settings",
+      analytics: "Analytics"
+    },
+    analytics: {
+      title: "Analytics",
+      netWorthTrend: "Net Worth History",
+      incomeTrend: "Income vs Expenses",
+      last12months: "Last 12 months",
+      forecast: "Cashflow Forecast",
+      forecastDesc: "Next 12 months at current rates",
+      noHistory: "No history yet. Update your account balances regularly.",
+      onTrack: "On track",
+      behind: "Behind schedule",
+      ahead: "months ahead",
+      behindBy: "months behind",
+      estimatedDone: "Est. completion",
+      surplus: "Monthly surplus",
+      cumulative: "Cumulative savings",
+      income: "Income",
+      expenses: "Expenses"
     },
     dashboard: {
       netWorth: "Your Total Net Worth",
@@ -142,6 +161,31 @@ export const translations: Translations = {
       convert: "Convert",
       resetAppConfirm: "Are you sure? This will permanently delete all your data — accounts, incomes, expenses, goals and payment history.",
       delete: "Delete everything"
+    },
+    analytics: {
+      title: "Analytics",
+      netWorthTrend: "Net Worth History",
+      incomeTrend: "Income vs Expenses",
+      last12months: "Last 12 months",
+      forecast: "Cashflow Forecast",
+      forecastDesc: "Next 12 months at current rates",
+      noHistory: "No history yet. Update your account balances regularly.",
+      onTrack: "On track",
+      behind: "Behind schedule",
+      ahead: "months ahead",
+      behindBy: "months behind",
+      estimatedDone: "Est. completion",
+      surplus: "Monthly surplus",
+      cumulative: "Cumulative savings",
+      income: "Income",
+      expenses: "Expenses"
+    },
+    tabs: {
+      dashboard: "Dashboard",
+      cashflow: "Cashflow",
+      savings: "Savings",
+      settings: "Settings",
+      analytics: "Analytics"
     }
   },
   pl: {
@@ -163,7 +207,26 @@ export const translations: Translations = {
       dashboard: "Pulpit",
       cashflow: "Przepływy",
       savings: "Oszczędności",
-      settings: "Ustawienia"
+      settings: "Ustawienia",
+      analytics: "Analizy"
+    },
+    analytics: {
+      title: "Analizy",
+      netWorthTrend: "Historia Majątku",
+      incomeTrend: "Przychody vs Wydatki",
+      last12months: "Ostatnie 12 miesięcy",
+      forecast: "Prognoza Cashflow",
+      forecastDesc: "Najbliższe 12 miesięcy przy obecnych stawkach",
+      noHistory: "Brak historii. Regularnie aktualizuj salda kont.",
+      onTrack: "Na czasie",
+      behind: "Opóźniony",
+      ahead: "mies. przed terminem",
+      behindBy: "mies. po terminie",
+      estimatedDone: "Szac. ukończenie",
+      surplus: "Nadwyżka miesięczna",
+      cumulative: "Skumulowane oszczędności",
+      income: "Przychody",
+      expenses: "Wydatki"
     },
     dashboard: {
       netWorth: "Twoje Całkowite Net Worth",
