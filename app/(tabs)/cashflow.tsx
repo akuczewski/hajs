@@ -56,16 +56,22 @@ export default function CashflowScreen() {
   const [editType, setEditType] = useState<'INCOME' | 'FIXED_EXPENSE' | 'LIABILITY'>('INCOME');
   const [editItem, setEditItem] = useState<Income | FixedExpense | Liability | null>(null);
 
-  // Ordered lists (fallback to original order if order array is empty/stale)
-  const orderedIncomes = incomeOrder.length > 0
-    ? incomeOrder.map(id => incomes.find(i => i.id === id)).filter(Boolean) as Income[]
-    : incomes;
-  const orderedExpenses = expenseOrder.length > 0
-    ? expenseOrder.map(id => fixedExpenses.find(e => e.id === id)).filter(Boolean) as FixedExpense[]
-    : fixedExpenses;
-  const orderedLiabilities = liabilityOrder.length > 0
-    ? liabilityOrder.map(id => liabilities.find(l => l.id === id)).filter(Boolean) as Liability[]
-    : liabilities;
+  // Ordered lists — items not present in order array (migration safety) appended at end
+  const orderedIncomes = (() => {
+    const ordered = incomeOrder.map(id => incomes.find(i => i.id === id)).filter(Boolean) as Income[];
+    const unordered = incomes.filter(i => !incomeOrder.includes(i.id));
+    return [...ordered, ...unordered];
+  })();
+  const orderedExpenses = (() => {
+    const ordered = expenseOrder.map(id => fixedExpenses.find(e => e.id === id)).filter(Boolean) as FixedExpense[];
+    const unordered = fixedExpenses.filter(e => !expenseOrder.includes(e.id));
+    return [...ordered, ...unordered];
+  })();
+  const orderedLiabilities = (() => {
+    const ordered = liabilityOrder.map(id => liabilities.find(l => l.id === id)).filter(Boolean) as Liability[];
+    const unordered = liabilities.filter(l => !liabilityOrder.includes(l.id));
+    return [...ordered, ...unordered];
+  })();
 
   const fixedIncomes = orderedIncomes.filter(i => i.isFixed);
   const variableIncomes = orderedIncomes.filter(i => !i.isFixed);

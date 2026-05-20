@@ -4,7 +4,7 @@
 
 React Native / Expo personal finance app. Zero-based budgeting philosophy — every złoty has a job. Target: replace day-to-day budget tracking AND serve as a full Microsoft Money-style personal finance tool.
 
-**Version:** 1.1.0 | **Platform:** iOS primary, Android secondary  
+**Version:** 1.2.1 | **Platform:** iOS primary, Android secondary  
 **Bundle ID:** `com.hajs.app` | **EAS ProjectID:** `e990254d-7ef9-4177-82e0-87bf510642c5`
 
 ---

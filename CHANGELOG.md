@@ -5,13 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-05-20
+
+### Fixed
+- **Cashflow income/expense lists blank despite non-zero totals**: When user data pre-dated the ordering feature, the `incomeOrder` / `expenseOrder` / `liabilityOrder` arrays contained stale seed IDs that didn't match any real item IDs. The ordered-list mapping returned all `undefined`, so `.filter(Boolean)` produced an empty array — items were invisible even though totals computed correctly. Fix: items whose IDs are absent from the order array are now appended at the end of the list instead of being silently dropped. Applies to all three arrays (income, expense, liability).
+
+---
+
 ## [1.2.0] - 2026-05-20
 
 ### Added
-- **Delete Sinking Fund**: Users can now delete savings goals (Sinking Funds) directly from the Goals tab via a trash icon — previously there was no way to remove a goal.
-- **Reset App**: Implemented the previously non-functional "Clear all data" button in Settings. Triggers a confirmation Alert and wipes all user data (incomes, expenses, goals, liabilities, accounts) while preserving language and currency preferences.
-- **`useMonthNavigation` hook** (`hooks/useMonthNavigation.ts`): Centralised shared hook encapsulating all month navigation logic — `handlePrevMonth`, `handleNextMonth`, `handleToday`, `getMonthName`, and swipe `PanResponder`. Eliminates duplicated code across Dashboard and Cashflow screens.
-- **CLAUDE.md**: Added project-level documentation for AI-assisted development — covers architecture, data model, colour system, known issues table, and coding conventions.
+- **Analytics tab** (`app/(tabs)/analytics.tsx`): New dedicated screen with four sections — monthly surplus/cumulative summary cards, Net Worth history chart (last 12 months), Income vs Expenses grouped bar chart (last 12 months with averages), and a 12-month cashflow forecast with cumulative line chart.
+- **SVG Charts** (`components/charts/LineChart.tsx`, `components/charts/BarChart.tsx`): Custom React Native SVG charts with cubic-bezier smoothed lines, gradient fills, month axis labels, and tooltip-style value dots. Zero external chart libraries.
+- **Net Worth Timeline on Dashboard**: Live sparkline chart on Dashboard showing the last 7 months of net worth history pulled from `netWorthHistory` in the store.
+- **Net Worth auto-snapshot**: Account balance changes (add, update, delete, currency switch) now automatically write a `netWorthHistory[YYYY-MM]` snapshot so the charts populate without manual action.
+- **Analytics i18n keys** (`analytics.*`): Full EN + PL translations for all analytics screen strings.
+- **Cashflow forecast helpers** (`getTrendData`, `getForecastData`, `getMonthRange`): New pure functions exported from `useBudgetStore.ts` that compute historical income/expense trend data and forward-looking cashflow projections.
+- **Edit items in Cashflow** (`components/EditItemModal.tsx`): New bottom-sheet modal for fully editing income name/amount/type, expense name/amount/category, and liability name/amount/type without deleting and re-adding.
+- **Reorder items in Cashflow**: Up/down chevron buttons on every income, expense, and liability row. Order persisted via `incomeOrder`, `expenseOrder`, `liabilityOrder` arrays in the store.
+- **New asset types — Real Estate & Car**: Added `REAL_ESTATE` and `CAR` to `AccountType`. Dashboard and Savings screens display `Home` and `Car` icons respectively.
+- **Sinking Fund break-even**: Each goal in the Savings tab now shows whether the user is on track, ahead, or behind — calculated by `getSinkingFundBreakEven()` and rendered under the progress bar.
+- **Settings via gear icon**: Removed Settings from the tab bar. A gear icon (⚙) in the top-right of the Dashboard opens the Settings screen via `router.push('/settings')`.
+- **Delete Sinking Fund**: Users can now delete savings goals via a trash icon in the Goals tab — previously there was no removal action.
+- **Reset App**: Implemented the previously non-functional "Clear all data" button in Settings. Triggers a confirmation Alert and wipes all user data while preserving language and currency preferences.
+- **`useMonthNavigation` hook** (`hooks/useMonthNavigation.ts`): Shared hook encapsulating all month navigation logic — `handlePrevMonth`, `handleNextMonth`, `handleToday`, `getMonthName`, and swipe `PanResponder`.
+- **CLAUDE.md**: Project-level documentation for AI-assisted development — architecture, data model, colour system, known issues table, coding conventions.
 
 ### Fixed
 - **English UI broken**: ~20 translation keys present in Polish (`cashflow.*`, `savings.*`, `settings.*`) were entirely missing from the English translations. The `t()` fallback was returning raw key paths (e.g. `cashflow.editAmount`) instead of text. All keys are now present in both languages.
