@@ -101,7 +101,8 @@ export const getForecastData = (
     const expenses =
       fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, month), 0) +
       liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, month), 0) +
-      sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0);
+      // Stop counting a sinking fund once its deadline has passed
+      sinkingFunds.reduce((acc, s) => month <= s.deadline ? acc + calculateMonthlyRequired(s) : acc, 0);
     const surplus = income - expenses;
     cumulative += surplus;
     return { month, surplus, cumulative };
