@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList, PanResponder } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react-native';
+import { useMonthNavigation } from '../../hooks/useMonthNavigation';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AccountType } from '../../store/types';
 
@@ -17,76 +18,44 @@ const accountIconMap: Record<AccountType, JSX.Element> = {
 };
 
 export default function DashboardScreen() {
-  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, activeMonth, setActiveMonth } = useBudgetStore();
+  const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
-  const handlePrevMonth = () => {
-    const [year, month] = activeMonth.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1 - 1, 1);
-    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
-  };
-
-  const handleNextMonth = () => {
-    const [year, month] = activeMonth.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1 + 1, 1);
-    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
-  };
-
-  const handleToday = () => {
-    setActiveMonth(new Date().toISOString().slice(0, 7));
-  };
-  
-  const currentDateStr = new Date().toISOString().slice(0, 7);
-  const isCurrentMonth = activeMonth === currentDateStr;
-  const isPastMonth = activeMonth < currentDateStr;
-  const isFutureMonth = activeMonth > currentDateStr;
-  
-  const isMaxFutureReached = isMaxFutureMonthReached(activeMonth, currentDateStr, 3);
-
-  const swipePanResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10 && Math.abs(g.dy) < 40,
-    onPanResponderRelease: (_, g) => {
-      if (g.dx < -30) {
-        if (!isMaxFutureReached) handleNextMonth();
-      } else if (g.dx > 30) {
-        handlePrevMonth();
-      }
-    },
-  });
-
-  const getMonthName = (monthStr: string) => {
-    const num = parseInt(monthStr.split('-')[1]);
-    const months = [
-      t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
-      t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
-      t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec')
-    ];
-    return `${months[num - 1]} ${monthStr.split('-')[0]}`;
-  };
+  const {
+    activeMonth,
+    isCurrentMonth,
+    isPastMonth,
+    isFutureMonth,
+    isMaxFutureReached,
+    handlePrevMonth,
+    handleNextMonth,
+    handleToday,
+    getMonthName,
+    swipePanResponder,
+  } = useMonthNavigation();
 
   const totalIncome = incomes.reduce((acc, curr) => acc + getIncomeAmount(curr, activeMonth), 0);
   const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
 
-  // Zbudowanie miesięcznej listy zadań (Monthly Checklist)
   const checklistItems = [
     ...fixedExpenses.map(exp => ({
       id: exp.id,
-      kind: 'FIXED',
+      kind: 'FIXED' as const,
       name: exp.name,
       amount: getExpenseAmount(exp, activeMonth),
       isPaid: exp.paymentHistory?.includes(activeMonth) || false
     })),
     ...liabilities.map(lib => ({
       id: lib.id,
-      kind: 'LIABILITY',
+      kind: 'LIABILITY' as const,
       name: lib.name,
       amount: getLiabilityAmount(lib, activeMonth),
       isPaid: lib.paymentHistory?.includes(activeMonth) || false
     })),
     ...sinkingFunds.map(s => ({
       id: s.id,
-      kind: 'GOAL',
+      kind: 'GOAL' as const,
       name: s.name,
       amount: calculateMonthlyRequired(s),
       isPaid: (s.paymentHistory || []).includes(activeMonth)
@@ -96,14 +65,13 @@ export default function DashboardScreen() {
   const paidItemsCount = checklistItems.filter(item => item.isPaid).length;
   const totalItemsCount = checklistItems.length;
   const progressPercent = totalItemsCount > 0 ? (paidItemsCount / totalItemsCount) * 100 : 0;
-
   const totalMonthlyObligations = checklistItems.reduce((acc, curr) => acc + curr.amount, 0);
   const safeToSpend = totalIncome > totalMonthlyObligations ? totalIncome - totalMonthlyObligations : 0;
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} className="pt-6">
-        
+
         {/* Header - Net Worth */}
         <View className="px-5 mb-2">
           <Text className="text-zinc-400 font-medium text-sm mb-1 uppercase tracking-widest">{t('dashboard.netWorth')}</Text>
@@ -112,7 +80,7 @@ export default function DashboardScreen() {
           </Text>
         </View>
 
-        {/* Month Navigation Header */}
+        {/* Month Navigation */}
         <View className="px-5 mt-2 mb-4 flex-row items-center justify-center">
           <View
             className="bg-[#1C1F22] px-5 py-3 rounded-2xl border border-[#272A2E] flex-row items-center"
@@ -143,9 +111,9 @@ export default function DashboardScreen() {
 
         {!isCurrentMonth && (
           <View className="px-5 mb-2 items-center">
-             <TouchableOpacity onPress={handleToday} className="bg-[#34D399]/10 px-4 py-2 rounded-full border border-[#34D399]/20">
-               <Text className="text-[#34D399] text-xs font-bold uppercase tracking-widest">{t('dashboard.backToToday')}</Text>
-             </TouchableOpacity>
+            <TouchableOpacity onPress={handleToday} className="bg-[#34D399]/10 px-4 py-2 rounded-full border border-[#34D399]/20">
+              <Text className="text-[#34D399] text-xs font-bold uppercase tracking-widest">{t('dashboard.backToToday')}</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -158,20 +126,12 @@ export default function DashboardScreen() {
                 <Stop offset="1" stopColor="#111315" stopOpacity="0" />
               </LinearGradient>
             </Defs>
-            <Path
-              d="M0 60 Q 25 80, 50 40 T 100 30 L 100 100 L 0 100 Z"
-              fill="url(#grad)"
-            />
-            <Path
-              d="M0 60 Q 25 80, 50 40 T 100 30"
-              fill="none"
-              stroke="#34D399"
-              strokeWidth="1.5"
-            />
+            <Path d="M0 60 Q 25 80, 50 40 T 100 30 L 100 100 L 0 100 Z" fill="url(#grad)" />
+            <Path d="M0 60 Q 25 80, 50 40 T 100 30" fill="none" stroke="#34D399" strokeWidth="1.5" />
           </Svg>
         </View>
 
-        {/* Action Buttons: Pay Yourself First */}
+        {/* Pay Yourself First */}
         <View className="px-5 mb-8">
           <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6">
             <Text className="text-white text-xl font-bold mb-2">{t('dashboard.payYourselfFirst')}</Text>
@@ -190,20 +150,15 @@ export default function DashboardScreen() {
             <Text className="text-zinc-500 text-xs mt-1">{t('dashboard.markAsPaid')}</Text>
           </View>
 
-          {checklistItems.length === 0 && (
-             <Text className="text-zinc-500 text-center py-4">{t('dashboard.noBills')}</Text>
-          )}
-
-          {/* Progress bar */}
           <View className="h-2 w-full bg-[#1C1F22] rounded-full overflow-hidden mb-5">
             <View className="h-full bg-[#34D399] rounded-full" style={{ width: `${progressPercent}%` }} />
           </View>
 
           {checklistItems.length === 0 ? (
-            <Text className="text-zinc-600 text-center my-4">Brak rachunków w tym miesiącu!</Text>
+            <Text className="text-zinc-500 text-center py-4">{t('dashboard.noBills')}</Text>
           ) : (
             checklistItems.map(item => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={item.id}
                 onPress={() => {
                   if (item.kind === 'FIXED') toggleFixedExpensePayment(item.id, activeMonth);
@@ -230,7 +185,7 @@ export default function DashboardScreen() {
           )}
         </View>
 
-        {/* Read-Only Accounts Slider */}
+        {/* Assets Slider */}
         <View className="mb-8 pl-5">
           <View className="flex-row justify-between items-center pr-5 mb-4">
             <Text className="text-white text-lg font-bold">{t('dashboard.yourAssets')}</Text>
@@ -259,7 +214,7 @@ export default function DashboardScreen() {
               )}
             />
           ) : (
-            <Text className="text-zinc-500 italic pr-5">Nie dodano jeszcze żadnych aktywów. Przejdź do zakładki Savings.</Text>
+            <Text className="text-zinc-500 italic pr-5">{t('dashboard.noAssetsYet')}</Text>
           )}
         </View>
 

@@ -6,7 +6,6 @@ export interface Income {
   name: string;
   amount: number;
   isFixed: boolean;
-  history?: { month: string; amount: number }[]; // Legacy
   overrides?: Record<string, number>; // 'YYYY-MM': amount
   createdAt: string;
 }
@@ -71,9 +70,10 @@ export interface AppState {
   addSinkingFund: (fund: SinkingFund) => void;
   addLiability: (liability: Liability) => void;
   addAccount: (account: Account) => void;
-  
+
   deleteIncome: (id: string) => void;
   deleteFixedExpense: (id: string) => void;
+  deleteSinkingFund: (id: string) => void;
   deleteLiability: (id: string) => void;
   deleteAccount: (id: string) => void;
 
@@ -86,4 +86,5 @@ export interface AppState {
   setActiveMonth: (month: string) => void;
   updateAccount: (id: string, updates: Partial<Account>) => void;
   updateSinkingFundBalance: (id: string, amount: number) => void;
+  resetApp: () => void;
 }

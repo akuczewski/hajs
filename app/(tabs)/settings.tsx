@@ -6,7 +6,7 @@ import { Settings as SettingsIcon, Globe, Trash2, RefreshCw, Languages } from 'l
 import { useTranslation } from '../../store/i18n';
 
 export default function SettingsScreen() {
-  const { currency, changeCurrency, language, setLanguage } = useBudgetStore();
+  const { currency, changeCurrency, language, setLanguage, resetApp } = useBudgetStore();
   const { t } = useTranslation();
 
   const handleCurrencyChange = (newCurrency: Currency) => {
@@ -104,9 +104,19 @@ export default function SettingsScreen() {
             {t('settings.dangerDesc')}
           </Text>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.5)' }}
             className="border py-4 rounded-xl items-center flex-row justify-center"
+            onPress={() =>
+              Alert.alert(
+                t('settings.resetApp'),
+                t('settings.resetAppConfirm'),
+                [
+                  { text: t('settings.cancel'), style: 'cancel' },
+                  { text: t('settings.delete'), style: 'destructive', onPress: resetApp }
+                ]
+              )
+            }
           >
             <RefreshCw color="#EF4444" size={20} />
             <Text className="text-red-500 font-bold ml-2">{t('settings.resetApp')}</Text>
