@@ -231,7 +231,7 @@ export default function SavingsScreen() {
                       }}
                       className="flex-1 bg-[#3B82F6] py-4 rounded-xl items-center"
                     >
-                      <Text className="text-white font-bold">{t('cashflow.saveIncome')}</Text>
+                      <Text className="text-white font-bold">{t('savings.saveAsset')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
