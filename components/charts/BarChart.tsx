@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import Svg, { Rect, Line, Defs, Pattern } from 'react-native-svg';
+import Svg, { Rect, Line } from 'react-native-svg';
 
 interface BarDataPoint {
   month: string;
@@ -37,14 +37,13 @@ export default function BarChart({
   const chartW = W - PAD_LEFT - PAD_RIGHT;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
-  const allValues = data.flatMap(d => [d.income, d.expenses]);
-  const maxV = Math.max(...allValues, 1);
+  // Scale to max income so all bars share the same reference
+  const maxV = Math.max(...data.map(d => d.income), 1);
 
   const slotW = chartW / data.length;
-  const barW = Math.max(4, slotW * 0.32);
-  const gap = barW * 0.3;
+  const barW = Math.max(6, slotW * 0.65);
 
-  const toBarH = (v: number) => (v / maxV) * chartH;
+  const toH = (v: number) => (Math.min(v, maxV) / maxV) * chartH;
 
   const formatM = (m: string) => {
     if (formatLabel) return formatLabel(m);
@@ -53,8 +52,6 @@ export default function BarChart({
   };
 
   const step = data.length > 10 ? 3 : data.length > 6 ? 2 : 1;
-
-  // Find where forecast starts for the divider line
   const forecastStartIdx = data.findIndex(d => d.isForecast);
 
   return (
@@ -67,7 +64,7 @@ export default function BarChart({
           stroke="#27272A" strokeWidth="1"
         />
 
-        {/* Vertical divider between history and forecast */}
+        {/* Divider between history and forecast */}
         {forecastStartIdx > 0 && (
           <Line
             x1={PAD_LEFT + forecastStartIdx * slotW}
@@ -82,35 +79,75 @@ export default function BarChart({
 
         {data.map((d, i) => {
           const slotX = PAD_LEFT + i * slotW + slotW / 2;
-          const incH = toBarH(d.income);
-          const expH = toBarH(d.expenses);
-          const incX = slotX - gap / 2 - barW;
-          const expX = slotX + gap / 2;
-          const isGrey = d.isForecast || d.isEstimated;
-          const opacity = d.isForecast ? 0.38 : d.isEstimated ? 0.28 : d.isCurrentMonth ? 1 : 0.8;
-          const barHeight = d.isEstimated ? Math.max(chartH * 0.15, 4) : undefined;
+          const barX = slotX - barW / 2;
+          const baseOpacity = d.isForecast ? 0.4 : d.isCurrentMonth ? 1 : 0.8;
+
+          // Estimated months: uniform grey stub
+          if (d.isEstimated) {
+            const stubH = Math.max(chartH * 0.15, 4);
+            return (
+              <Rect
+                key={d.month}
+                x={barX}
+                y={PAD_TOP + chartH - stubH}
+                width={barW}
+                height={stubH}
+                fill="#3F3F46"
+                rx="3"
+                opacity="0.4"
+              />
+            );
+          }
+
+          const incH = toH(d.income);
+          const expH = toH(d.expenses);
+          const cappedExpH = Math.min(expH, incH);
+          // Expenses over income → overflow shown in red
+          const overflowH = expH > incH ? expH - incH : 0;
+          const surplusH = Math.max(incH - cappedExpH, 0);
+
+          const color = d.isForecast ? '#6B7280' : incomeColor;
+          const expColor = d.isForecast ? '#9CA3AF' : expenses_overflow(d) ? '#EF4444' : expenseColor;
 
           return (
             <React.Fragment key={d.month}>
-              <Rect
-                x={incX}
-                y={PAD_TOP + chartH - (d.isEstimated ? barHeight! : incH)}
-                width={barW}
-                height={d.isEstimated ? barHeight! : Math.max(incH, 1)}
-                fill={isGrey ? '#6B7280' : incomeColor}
-                rx="2"
-                opacity={opacity}
-              />
-              <Rect
-                x={expX}
-                y={PAD_TOP + chartH - (d.isEstimated ? barHeight! : expH)}
-                width={barW}
-                height={d.isEstimated ? barHeight! : Math.max(expH, 1)}
-                fill={isGrey ? '#6B7280' : expenseColor}
-                rx="2"
-                opacity={opacity}
-              />
-              {/* Current month dot indicator */}
+              {/* Surplus / income portion (top) */}
+              {surplusH > 0 && (
+                <Rect
+                  x={barX}
+                  y={PAD_TOP + chartH - incH}
+                  width={barW}
+                  height={surplusH}
+                  fill={color}
+                  rx="3"
+                  opacity={baseOpacity}
+                />
+              )}
+              {/* Expense portion (bottom) — lower opacity to contrast with surplus */}
+              {cappedExpH > 0 && (
+                <Rect
+                  x={barX}
+                  y={PAD_TOP + chartH - cappedExpH}
+                  width={barW}
+                  height={cappedExpH}
+                  fill={d.isForecast ? '#9CA3AF' : expenseColor}
+                  rx="3"
+                  opacity={baseOpacity * 0.55}
+                />
+              )}
+              {/* Overflow: expenses exceed income */}
+              {overflowH > 0 && (
+                <Rect
+                  x={barX}
+                  y={PAD_TOP + chartH - incH - overflowH}
+                  width={barW}
+                  height={overflowH}
+                  fill="#EF4444"
+                  rx="3"
+                  opacity={baseOpacity}
+                />
+              )}
+              {/* Current month dot */}
               {d.isCurrentMonth && (
                 <Rect
                   x={slotX - 2}
@@ -119,7 +156,7 @@ export default function BarChart({
                   height={4}
                   rx="2"
                   fill="#FFFFFF"
-                  opacity="0.6"
+                  opacity="0.5"
                 />
               )}
             </React.Fragment>
@@ -138,7 +175,7 @@ export default function BarChart({
               style={{
                 position: 'absolute',
                 left: `${(slotCenter / W) * 100}%`,
-                transform: [{ translateX: -8 }],
+                transform: [{ translateX: -10 }],
               }}
             >
               <Text style={{ color: d.isForecast ? '#6B7280' : '#52525B', fontSize: 10 }}>
@@ -150,4 +187,9 @@ export default function BarChart({
       </View>
     </View>
   );
+}
+
+// helper to avoid inline logic in JSX
+function expenses_overflow(d: { income: number; expenses: number }) {
+  return d.expenses > d.income;
 }

@@ -21,24 +21,14 @@ export default function AnalyticsScreen() {
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
-  // Current month surplus — same formula as Dashboard "free funds"
-  const totalIncome = incomes.reduce((acc, i) => acc + getIncomeAmount(i, currentMonth), 0);
-  const totalObligations =
-    fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, currentMonth), 0) +
-    liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, currentMonth), 0) +
-    sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0);
-  const currentSurplus = totalIncome - totalObligations;
-
-  // Next 11 months forecast (using 3-month avg for variable income when available)
-  const forecastMonths = getMonthRange(currentMonth, 11, 'forward');
-  const forecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, forecastMonths);
-
-  // Cumulative chart: current month as point 0, then +11 projected months = 12 total
-  const cumulativeChartData = [
-    { month: currentMonth, value: currentSurplus },
-    ...forecastData.map(d => ({ month: d.month, value: currentSurplus + d.cumulative })),
-  ];
-  const totalCumulative = cumulativeChartData[cumulativeChartData.length - 1]?.value ?? currentSurplus;
+  // 12-month cumulative forecast starting from current month.
+  // getForecastData is deadline-aware for sinking funds and uses variable income projection —
+  // this makes the displayed "monthly surplus" consistent with the cumulative total.
+  const cumulativeForecastMonths = [currentMonth, ...getMonthRange(currentMonth, 11, 'forward')];
+  const cumulativeForecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, cumulativeForecastMonths);
+  const currentSurplus = cumulativeForecastData[0]?.surplus ?? 0;
+  const totalCumulative = cumulativeForecastData[cumulativeForecastData.length - 1]?.cumulative ?? 0;
+  const cumulativeChartData = cumulativeForecastData.map(d => ({ month: d.month, value: d.cumulative }));
 
   // Last 6 months — month has "real" data if any income/expense has an override for it
   const hasDataForMonth = (month: string) =>
@@ -162,12 +152,11 @@ export default function AnalyticsScreen() {
           {/* Legend */}
           <View className="flex-row gap-4 mb-3 flex-wrap">
             <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-sm bg-[#34D399] mr-1" />
-              <Text className="text-zinc-400 text-xs">{t('analytics.income')}</Text>
-            </View>
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-sm bg-[#EAB308] mr-1" />
-              <Text className="text-zinc-400 text-xs">{t('analytics.expenses')}</Text>
+              <View className="w-8 h-3 rounded-sm mr-2 overflow-hidden flex-row">
+                <View className="flex-1 bg-[#34D399]" />
+                <View className="flex-1 bg-[#EAB308] opacity-55" />
+              </View>
+              <Text className="text-zinc-400 text-xs">{t('analytics.income')} / {t('analytics.expenses')}</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-sm bg-[#6B7280] mr-1 opacity-50" />
