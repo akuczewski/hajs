@@ -6,7 +6,8 @@ export interface Income {
   name: string;
   amount: number;
   isFixed: boolean;
-  history: { month: string; amount: number }[]; // 'YYYY-MM'
+  history?: { month: string; amount: number }[]; // Legacy
+  overrides?: Record<string, number>; // 'YYYY-MM': amount
   createdAt: string;
 }
 
@@ -16,6 +17,7 @@ export interface FixedExpense {
   amount: number;
   category: string;
   paymentHistory?: string[]; // 'YYYY-MM'
+  overrides?: Record<string, number>;
   createdAt: string;
 }
 
@@ -38,6 +40,7 @@ export interface Liability {
   totalInstallments?: number;
   paidInstallments?: number;
   paymentHistory: string[]; // 'YYYY-MM'
+  overrides?: Record<string, number>;
   createdAt: string;
 }
 
@@ -77,6 +80,7 @@ export interface AppState {
   toggleLiabilityPayment: (id: string, month: string) => void;
   toggleFixedExpensePayment: (id: string, month: string) => void;
   toggleSinkingFundPayment: (id: string, month: string) => void;
+  setAmountOverride: (type: 'INCOME' | 'FIXED_EXPENSE' | 'LIABILITY', id: string, month: string, amount: number | null) => void;
   changeCurrency: (newCurrency: Currency) => void;
   setLanguage: (lang: Language) => void;
   setActiveMonth: (month: string) => void;

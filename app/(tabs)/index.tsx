@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
@@ -37,7 +37,10 @@ export default function DashboardScreen() {
     setActiveMonth(new Date().toISOString().slice(0, 7));
   };
   
-  const isCurrentMonth = activeMonth === new Date().toISOString().slice(0, 7);
+  const currentDateStr = new Date().toISOString().slice(0, 7);
+  const isCurrentMonth = activeMonth === currentDateStr;
+  const isPastMonth = activeMonth < currentDateStr;
+  const isFutureMonth = activeMonth > currentDateStr;
 
   const getMonthName = (monthStr: string) => {
     const num = parseInt(monthStr.split('-')[1]);
@@ -49,7 +52,7 @@ export default function DashboardScreen() {
     return `${months[num - 1]} ${monthStr.split('-')[0]}`;
   };
 
-  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalIncome = incomes.reduce((acc, curr) => acc + getIncomeAmount(curr, activeMonth), 0);
   const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
 
   // Zbudowanie miesięcznej listy zadań (Monthly Checklist)
@@ -58,14 +61,14 @@ export default function DashboardScreen() {
       id: exp.id,
       kind: 'FIXED',
       name: exp.name,
-      amount: exp.amount,
+      amount: getExpenseAmount(exp, activeMonth),
       isPaid: exp.paymentHistory?.includes(activeMonth) || false
     })),
     ...liabilities.map(lib => ({
       id: lib.id,
       kind: 'LIABILITY',
       name: lib.name,
-      amount: lib.monthlyPayment,
+      amount: getLiabilityAmount(lib, activeMonth),
       isPaid: lib.paymentHistory?.includes(activeMonth) || false
     })),
     ...sinkingFunds.map(s => ({
@@ -105,15 +108,22 @@ export default function DashboardScreen() {
           <View className="bg-[#1C1F22] px-4 py-2 rounded-2xl border border-[#272A2E] flex-row items-center">
             <CalendarDays color="#34D399" size={16} style={{ marginRight: 8 }} />
             <Text className="text-white font-bold text-base" style={{ marginRight: 8 }}>{getMonthName(activeMonth)}</Text>
-            {isCurrentMonth ? (
+            {isCurrentMonth && (
               <View className="bg-[#34D399]/20 px-2 py-1 rounded-md flex-row items-center">
                 <View className="w-2 h-2 rounded-full bg-[#34D399] mr-1" />
                 <Text className="text-[#34D399] text-xs font-bold">{t('dashboard.currentMonth')}</Text>
               </View>
-            ) : (
+            )}
+            {isPastMonth && (
               <View className="bg-[#8B5CF6]/20 px-2 py-1 rounded-md flex-row items-center">
                 <View className="w-2 h-2 rounded-full bg-[#8B5CF6] mr-1" />
-                <Text className="text-[#8B5CF6] text-xs font-bold">{t('dashboard.archive')}</Text>
+                <Text className="text-[#8B5CF6] text-xs font-bold">{t('dashboard.pastMonth')}</Text>
+              </View>
+            )}
+            {isFutureMonth && (
+              <View className="bg-[#3B82F6]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#3B82F6] mr-1" />
+                <Text className="text-[#3B82F6] text-xs font-bold">{t('dashboard.futureMonth')}</Text>
               </View>
             )}
           </View>

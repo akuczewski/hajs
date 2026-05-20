@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { Briefcase, Activity, CheckCircle, Plus, Trash2 } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, SafeAreaView } from 'react-native';
+import { Briefcase, Activity, CheckCircle, Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
-import { useBudgetStore, CURRENCY_SYMBOLS } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
+import EditAmountModal from '../../components/EditAmountModal';
 
 export default function CashflowScreen() {
-  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, toggleFixedExpensePayment, deleteIncome, deleteFixedExpense, deleteLiability, currency } = useBudgetStore();
+  const { incomes, fixedExpenses, liabilities, addIncome, addFixedExpense, addLiability, toggleLiabilityPayment, toggleFixedExpensePayment, deleteIncome, deleteFixedExpense, deleteLiability, currency, activeMonth, setActiveMonth, setAmountOverride } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'INCOMES' | 'EXPENSES'>('INCOMES');
-  
-  const currentMonth = new Date().toISOString().slice(0, 7);
 
   // Forms state
   const [isAddingIncome, setIsAddingIncome] = useState(false);
@@ -27,13 +26,43 @@ export default function CashflowScreen() {
   const [creditTotalInstallments, setCreditTotalInstallments] = useState('');
   const [creditPaidInstallments, setCreditPaidInstallments] = useState('');
 
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editItemInfo, setEditItemInfo] = useState<{ id: string; type: 'INCOME' | 'FIXED_EXPENSE' | 'LIABILITY'; name: string; currentAmount: number; defaultAmount: number } | null>(null);
+
   // Computations
   const fixedIncomes = incomes.filter(i => i.isFixed);
   const variableIncomes = incomes.filter(i => !i.isFixed);
-  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalIncome = incomes.reduce((acc, curr) => acc + getIncomeAmount(curr, activeMonth), 0);
 
-  const totalExpenses = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0) + 
-                        liabilities.reduce((acc, curr) => acc + curr.monthlyPayment, 0);
+  const totalExpenses = fixedExpenses.reduce((acc, curr) => acc + getExpenseAmount(curr, activeMonth), 0) + 
+                        liabilities.reduce((acc, curr) => acc + getLiabilityAmount(curr, activeMonth), 0);
+
+  const currentDateStr = new Date().toISOString().slice(0, 7);
+  const isCurrentMonth = activeMonth === currentDateStr;
+  const isPastMonth = activeMonth < currentDateStr;
+  const isFutureMonth = activeMonth > currentDateStr;
+
+  const handlePrevMonth = () => {
+    const [year, month] = activeMonth.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1 - 1, 1);
+    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
+  };
+
+  const handleNextMonth = () => {
+    const [year, month] = activeMonth.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1 + 1, 1);
+    setActiveMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
+  };
+
+  const getMonthName = (monthStr: string) => {
+    const num = parseInt(monthStr.split('-')[1]);
+    const months = [
+      t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
+      t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
+      t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec')
+    ];
+    return `${months[num - 1]} ${monthStr.split('-')[0]}`;
+  };
 
   const handleAddIncome = () => {
     if (!incName || !incAmount) return;
@@ -91,9 +120,48 @@ export default function CashflowScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#111315] pt-12">
-      <View className="px-5 py-4 border-b border-zinc-800">
-        <Text className="text-white text-2xl font-bold mb-4">Cashflow</Text>
+    <SafeAreaView className="flex-1 bg-[#111315]">
+      <View className="px-5 pt-6 border-b border-zinc-800">
+        
+        {/* Month Navigation Header */}
+        <View className="mb-4 flex-row items-center justify-between">
+          <View className="bg-[#1C1F22] px-4 py-2 rounded-2xl border border-[#272A2E] flex-row items-center">
+            <CalendarDays color="#34D399" size={16} style={{ marginRight: 8 }} />
+            <Text className="text-white font-bold text-base" style={{ marginRight: 8 }}>{getMonthName(activeMonth)}</Text>
+            {isCurrentMonth && (
+              <View className="bg-[#34D399]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#34D399] mr-1" />
+                <Text className="text-[#34D399] text-xs font-bold">{t('dashboard.currentMonth')}</Text>
+              </View>
+            )}
+            {isPastMonth && (
+              <View className="bg-[#8B5CF6]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#8B5CF6] mr-1" />
+                <Text className="text-[#8B5CF6] text-xs font-bold">{t('dashboard.pastMonth')}</Text>
+              </View>
+            )}
+            {isFutureMonth && (
+              <View className="bg-[#3B82F6]/20 px-2 py-1 rounded-md flex-row items-center">
+                <View className="w-2 h-2 rounded-full bg-[#3B82F6] mr-1" />
+                <Text className="text-[#3B82F6] text-xs font-bold">{t('dashboard.futureMonth')}</Text>
+              </View>
+            )}
+          </View>
+          <View className="flex-row items-center space-x-2">
+            <TouchableOpacity onPress={handlePrevMonth} className="bg-[#1C1F22] p-2 rounded-full border border-[#272A2E]">
+              <ChevronLeft color="#A1A1AA" size={20} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleNextMonth} className="bg-[#1C1F22] p-2 rounded-full border border-[#272A2E]">
+              <ChevronRight color="#A1A1AA" size={20} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {!isCurrentMonth && (
+          <TouchableOpacity onPress={() => setActiveMonth(currentDateStr)} className="mb-4 self-start bg-[#262A2E] px-3 py-1 rounded-lg">
+            <Text className="text-zinc-400 text-xs font-medium">{t('dashboard.backToToday')}</Text>
+          </TouchableOpacity>
+        )}
         
         <View className="flex-row bg-[#1C1F22] rounded-xl p-1 border border-[#272A2E]">
           <TouchableOpacity 
@@ -165,31 +233,54 @@ export default function CashflowScreen() {
 
             <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-3 px-1">{t('cashflow.fixedIncome')}</Text>
             {fixedIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noFixedIncomes')}</Text>}
-            {fixedIncomes.map(inc => (
-              <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
-                <View className="flex-row items-center">
-                  <Briefcase color="#10B981" size={24} />
-                  <Text className="text-white font-bold text-lg ml-3">{inc.name}</Text>
+            {fixedIncomes.map(inc => {
+              const currentAmt = getIncomeAmount(inc, activeMonth);
+              return (
+                <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
+                  <View className="flex-row items-center">
+                    <Briefcase color="#10B981" size={24} />
+                    <Text className="text-white font-bold text-lg ml-3">{inc.name}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <TouchableOpacity 
+                      onPress={() => {
+                        setEditItemInfo({ id: inc.id, type: 'INCOME', name: inc.name, currentAmount: currentAmt, defaultAmount: inc.amount });
+                        setIsEditModalVisible(true);
+                      }}
+                      className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg"
+                    >
+                      <Text className="text-white font-bold text-lg mr-2">{symbol}{currentAmt.toLocaleString()}</Text>
+                      <Pencil color="#A1A1AA" size={14} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="ml-2 bg-[#262A2E] p-2 rounded-lg">
+                      <Trash2 color="#EF4444" size={18} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View className="flex-row items-center">
-                  <Text className="text-white font-bold text-lg mr-3">{symbol}{inc.amount.toLocaleString()}</Text>
-                  <TouchableOpacity onPress={() => deleteIncome(inc.id)} className="ml-2 bg-[#262A2E] p-2 rounded-lg">
-                    <Trash2 color="#EF4444" size={18} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              );
+            })}
 
             <Text className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-4 mb-3 px-1">{t('cashflow.variableIncome')}</Text>
             {variableIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noVariableIncomes')}</Text>}
-            {variableIncomes.map(inc => (
+            {variableIncomes.map(inc => {
+              const currentAmt = getIncomeAmount(inc, activeMonth);
+              return (
               <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 relative overflow-hidden">
                 <View className="flex-row justify-between items-center mb-4">
                   <View className="flex-row items-center">
                     <Activity color="#10B981" size={20} />
                     <Text className="text-white font-bold text-lg ml-2">{inc.name}</Text>
                   </View>
-                  <Text className="text-white font-bold text-lg">{symbol}{inc.amount.toLocaleString()}</Text>
+                  <TouchableOpacity 
+                    onPress={() => {
+                      setEditItemInfo({ id: inc.id, type: 'INCOME', name: inc.name, currentAmount: currentAmt, defaultAmount: inc.amount });
+                      setIsEditModalVisible(true);
+                    }}
+                    className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg"
+                  >
+                    <Text className="text-white font-bold text-lg mr-2">{symbol}{currentAmt.toLocaleString()}</Text>
+                    <Pencil color="#A1A1AA" size={14} />
+                  </TouchableOpacity>
                 </View>
                 
                 <View className="flex-row justify-between items-end">
@@ -209,7 +300,8 @@ export default function CashflowScreen() {
                   <Trash2 color="#EF4444" size={18} />
                 </TouchableOpacity>
               </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
@@ -316,7 +408,8 @@ export default function CashflowScreen() {
             </View>
             {liabilities.length === 0 && <Text className="text-zinc-500 mb-6">{t('cashflow.noSubs')}</Text>}
             {liabilities.map(sub => {
-              const isPaidThisMonth = sub.paymentHistory.includes(currentMonth);
+              const isPaidThisMonth = sub.paymentHistory.includes(activeMonth);
+              const currentAmt = getLiabilityAmount(sub, activeMonth);
               return (
                 <View key={sub.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-4 mb-3 flex-row justify-between items-center">
                   <View className="flex-row items-center flex-1">
@@ -335,9 +428,18 @@ export default function CashflowScreen() {
                     </View>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-white font-bold text-lg mr-4">{symbol}{sub.monthlyPayment}</Text>
                     <TouchableOpacity 
-                      onPress={() => toggleLiabilityPayment(sub.id, currentMonth)}
+                      onPress={() => {
+                        setEditItemInfo({ id: sub.id, type: 'LIABILITY', name: sub.name, currentAmount: currentAmt, defaultAmount: sub.monthlyPayment });
+                        setIsEditModalVisible(true);
+                      }}
+                      className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg mr-3"
+                    >
+                      <Text className="text-white font-bold text-lg mr-2">{symbol}{currentAmt}</Text>
+                      <Pencil color="#A1A1AA" size={14} />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      onPress={() => toggleLiabilityPayment(sub.id, activeMonth)}
                       className={`w-12 h-6 rounded-full justify-center px-1 mr-3 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
                     >
                       <View className={`w-4 h-4 rounded-full bg-white ${isPaidThisMonth ? 'self-end' : 'self-start'}`} />
@@ -355,7 +457,8 @@ export default function CashflowScreen() {
             </View>
             {fixedExpenses.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noFixedExpenses')}</Text>}
             {fixedExpenses.map(exp => {
-              const isPaidThisMonth = exp.paymentHistory?.includes(currentMonth);
+              const isPaidThisMonth = exp.paymentHistory?.includes(activeMonth);
+              const currentAmt = getExpenseAmount(exp, activeMonth);
               return (
                 <View key={exp.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 flex-row justify-between items-center">
                   <View className="flex-row items-center">
@@ -366,9 +469,18 @@ export default function CashflowScreen() {
                     </View>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-white font-bold text-lg mr-4">-{symbol}{exp.amount.toLocaleString()}</Text>
                     <TouchableOpacity 
-                      onPress={() => toggleFixedExpensePayment(exp.id, currentMonth)}
+                      onPress={() => {
+                        setEditItemInfo({ id: exp.id, type: 'FIXED_EXPENSE', name: exp.name, currentAmount: currentAmt, defaultAmount: exp.amount });
+                        setIsEditModalVisible(true);
+                      }}
+                      className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg mr-3"
+                    >
+                      <Text className="text-white font-bold text-lg mr-2">-{symbol}{currentAmt.toLocaleString()}</Text>
+                      <Pencil color="#A1A1AA" size={14} />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      onPress={() => toggleFixedExpensePayment(exp.id, activeMonth)}
                       className={`w-12 h-6 rounded-full justify-center px-1 mr-3 ${isPaidThisMonth ? 'bg-[#10B981]' : 'bg-[#3F3F46]'}`}
                     >
                       <View className={`w-4 h-4 rounded-full bg-white ${isPaidThisMonth ? 'self-end' : 'self-start'}`} />
@@ -386,6 +498,19 @@ export default function CashflowScreen() {
 
         <View className="h-10" />
       </ScrollView>
-    </View>
+
+      {editItemInfo && (
+        <EditAmountModal
+          visible={isEditModalVisible}
+          onClose={() => setIsEditModalVisible(false)}
+          currentAmount={editItemInfo.currentAmount}
+          defaultAmount={editItemInfo.defaultAmount}
+          itemName={editItemInfo.name}
+          onSave={(newAmount) => {
+            setAmountOverride(editItemInfo.type, editItemInfo.id, activeMonth, newAmount);
+          }}
+        />
+      )}
+    </SafeAreaView>
   );
 }

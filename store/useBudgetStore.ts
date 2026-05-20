@@ -26,6 +26,18 @@ export const calculateMonthlyRequired = (fund: SinkingFund) => {
   return fund.targetAmount / Math.max(1, totalMonths);
 };
 
+export const getIncomeAmount = (income: Income, month: string) => {
+  return income.overrides?.[month] !== undefined ? income.overrides[month] : income.amount;
+};
+
+export const getExpenseAmount = (expense: FixedExpense, month: string) => {
+  return expense.overrides?.[month] !== undefined ? expense.overrides[month] : expense.amount;
+};
+
+export const getLiabilityAmount = (liability: Liability, month: string) => {
+  return liability.overrides?.[month] !== undefined ? liability.overrides[month] : liability.monthlyPayment;
+};
+
 export const useBudgetStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -58,6 +70,29 @@ export const useBudgetStore = create<AppState>()(
       
       addAccount: (account) => set((state) => ({ accounts: [...state.accounts, account] })),
       deleteAccount: (id) => set((state) => ({ accounts: state.accounts.filter(a => a.id !== id) })),
+
+      setAmountOverride: (type, id, month, amount) => set((state) => {
+        const updateOverrides = (overrides: Record<string, number> | undefined) => {
+          const newOverrides = { ...overrides };
+          if (amount === null) {
+            delete newOverrides[month];
+          } else {
+            newOverrides[month] = amount;
+          }
+          return newOverrides;
+        };
+
+        if (type === 'INCOME') {
+          return { incomes: state.incomes.map(i => i.id === id ? { ...i, overrides: updateOverrides(i.overrides) } : i) };
+        }
+        if (type === 'FIXED_EXPENSE') {
+          return { fixedExpenses: state.fixedExpenses.map(e => e.id === id ? { ...e, overrides: updateOverrides(e.overrides) } : e) };
+        }
+        if (type === 'LIABILITY') {
+          return { liabilities: state.liabilities.map(l => l.id === id ? { ...l, overrides: updateOverrides(l.overrides) } : l) };
+        }
+        return state;
+      }),
 
       setLanguage: (lang) => set(() => ({ language: lang })),
       setActiveMonth: (month) => set(() => ({ activeMonth: month })),

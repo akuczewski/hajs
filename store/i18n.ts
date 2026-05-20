@@ -42,6 +42,8 @@ export const translations: Translations = {
       noAssetsYet: "No assets added yet. Go to the Savings tab.",
       currentMonth: "Current Month",
       archive: "Archive",
+      pastMonth: "Past",
+      futureMonth: "Future",
       backToToday: "Back to today"
     },
     cashflow: {
@@ -149,6 +151,8 @@ export const translations: Translations = {
       noAssetsYet: "Nie dodano jeszcze żadnych aktywów. Przejdź do zakładki Oszczędności.",
       currentMonth: "Bieżący",
       archive: "Historia",
+      pastMonth: "Ubiegły",
+      futureMonth: "Przyszły",
       backToToday: "Wróć do dzisiaj"
     },
     cashflow: {
@@ -199,7 +203,10 @@ export const translations: Translations = {
       paidThisMonth: "Opłacone w tym miesiącu",
       noSubs: "Brak subskrypcji.",
       monthlyFee: "Opłata miesięczna",
-      noFixedExpenses: "Brak stałych wydatków."
+      noFixedExpenses: "Brak stałych wydatków.",
+      editAmount: "Edytuj Kwotę",
+      saveAmount: "Zapisz nadpisanie",
+      resetToDefault: "Przywróć domyślną"
     },
     savings: {
       assetsTab: "AKTYWA",
