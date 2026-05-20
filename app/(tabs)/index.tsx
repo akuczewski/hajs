@@ -64,8 +64,19 @@ export default function DashboardScreen() {
     id: s.id,
     name: s.name,
     amount: calculateMonthlyRequired(s),
+    deadline: s.deadline,
     isPaid: (s.paymentHistory || []).includes(activeMonth),
   })).sort((a, b) => b.amount - a.amount);
+
+  const formatDeadline = (deadline: string) => {
+    const [year, month] = deadline.split('-');
+    const names = [
+      t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
+      t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
+      t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec'),
+    ];
+    return `${names[parseInt(month) - 1].slice(0, 3)} ${year}`;
+  };
 
   const allItems = [...billItems, ...goalItems];
   const paidCount = allItems.filter(i => i.isPaid).length;
@@ -223,14 +234,19 @@ export default function DashboardScreen() {
                 onPress={() => toggleSinkingFundPayment(item.id, activeMonth)}
                 className={`flex-row items-center justify-between p-4 mb-3 rounded-2xl border ${item.isPaid ? 'bg-[#1C1F22] border-[#272A2E]' : 'bg-[#1A1525] border-[#3B2F5E]'}`}
               >
-                <View className="flex-row items-center">
+                <View className="flex-row items-center flex-1 mr-3">
                   {item.isPaid
                     ? <CheckCircle color="#8B5CF6" size={24} />
                     : <PiggyBank color="#8B5CF6" size={24} />
                   }
-                  <Text className={`font-bold text-base ml-3 ${item.isPaid ? 'text-zinc-500 line-through' : 'text-white'}`}>
-                    {item.name}
-                  </Text>
+                  <View className="ml-3 flex-1">
+                    <Text className={`font-bold text-base ${item.isPaid ? 'text-zinc-500 line-through' : 'text-white'}`}>
+                      {item.name}
+                    </Text>
+                    <Text className="text-[#8B5CF6] text-xs opacity-70 mt-0.5">
+                      {t('dashboard.until')} {formatDeadline(item.deadline)}
+                    </Text>
+                  </View>
                 </View>
                 <Text className={`font-bold ${item.isPaid ? 'text-zinc-500 line-through' : 'text-[#8B5CF6]'}`}>
                   {symbol}{fmtAmount(item.amount)}
