@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { View, Text, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, ScrollView, SafeAreaView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import {
   useBudgetStore, CURRENCY_SYMBOLS,
@@ -15,7 +15,15 @@ import { TrendingUp, TrendingDown, BarChart2, Zap } from 'lucide-react-native';
 export default function AnalyticsScreen() {
   const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
 
+  const [refreshing, setRefreshing] = useState(false);
+
   useFocusEffect(useCallback(() => { recordNetWorthSnapshot(); }, []));
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    recordNetWorthSnapshot();
+    setRefreshing(false);
+  }, [recordNetWorthSnapshot]);
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
@@ -89,7 +97,11 @@ export default function AnalyticsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
-      <ScrollView contentContainerStyle={{ paddingBottom: 48 }} className="pt-6 px-5">
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 48 }}
+        className="pt-6 px-5"
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#34D399" />}
+      >
 
         {/* Header */}
         <View className="mb-6">
