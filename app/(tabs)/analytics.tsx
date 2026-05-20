@@ -29,14 +29,23 @@ export default function AnalyticsScreen() {
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
-  // 12-month cumulative forecast starting from current month.
-  // getForecastData is deadline-aware for sinking funds and uses variable income projection —
-  // this makes the displayed "monthly surplus" consistent with the cumulative total.
-  const cumulativeForecastMonths = [currentMonth, ...getMonthRange(currentMonth, 11, 'forward')];
-  const cumulativeForecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, cumulativeForecastMonths);
-  const currentSurplus = cumulativeForecastData[0]?.surplus ?? 0;
-  const totalCumulative = cumulativeForecastData[cumulativeForecastData.length - 1]?.cumulative ?? 0;
-  const cumulativeChartData = cumulativeForecastData.map(d => ({ month: d.month, value: d.cumulative }));
+  // Monthly surplus — identical formula to Dashboard "free funds" so both screens are in sync
+  const totalIncome = incomes.reduce((acc, i) => acc + getIncomeAmount(i, currentMonth), 0);
+  const totalObligations =
+    fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, currentMonth), 0) +
+    liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, currentMonth), 0) +
+    sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0);
+  const currentSurplus = totalIncome - totalObligations;
+
+  // 12-month cumulative: current month as point 0, then 11 projected months forward
+  // getForecastData is deadline-aware — surplus grows after a sinking fund's deadline passes
+  const forecastMonths = getMonthRange(currentMonth, 11, 'forward');
+  const forecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, forecastMonths);
+  const cumulativeChartData = [
+    { month: currentMonth, value: currentSurplus },
+    ...forecastData.map(d => ({ month: d.month, value: currentSurplus + d.cumulative })),
+  ];
+  const totalCumulative = cumulativeChartData[cumulativeChartData.length - 1]?.value ?? currentSurplus;
 
   // Last 6 months — month has "real" data if any income/expense has an override for it
   const hasDataForMonth = (month: string) =>
