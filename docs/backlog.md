@@ -7,8 +7,11 @@
 4. [x] Implementacja Głównego Dashboardu z widokiem Net Worth i "Pay yourself first".
 5. [x] Implementacja list i formularzy Przychodów (Cashflow).
 6. [x] Implementacja list Wydatków Stałych (Cashflow).
-7. [ ] Implementacja Kosztów Rocznych (Sinking Funds) z wizualizacją w postaci skarbonek.
+7. [x] Implementacja Kosztów Rocznych (Sinking Funds) z wizualizacją w postaci skarbonek.
 8. [x] Implementacja Zobowiązań (kredyty, subskrypcje) z checkboxami do oznaczania zapłaty.
+9. [x] Wdrożenie "wehikułu czasu" (nawigacja po miesiącach zsynchronizowana na wszystkich ekranach).
+10. [x] Edycja i nadpisywanie kwot przychodów/wydatków specyficznych tylko dla danego miesiąca.
+11. [x] Ograniczenie przewidywania przyszłości (max 3 miesiące w przód).
 
 ## Do zrobienia w wersji V2 (Future):
 1. [ ] Ekran z przyciskiem "Zaloguj z Google" dla subskrypcji. Integracja z Google API (Gmail/Play) do automatycznego wykrywania subskrypcji.

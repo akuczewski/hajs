@@ -17,3 +17,8 @@
 
 ## Epic 5: Pay Yourself First
 - Jako oszczędzający, chcę aby po wpisaniu wszystkich stałych opłat aplikacja podpowiedziała mi "Kwotę wolną" i zachęciła do natychmiastowego przelania jej na konto oszczędnościowe (Zero-Based Budgeting).
+
+## Epic 6: Planowanie w Czasie
+- Jako użytkownik, chcę przełączać się między miesiącami i widzieć przeszłe lub przyszłe kwoty wolne do wydania.
+- Jako użytkownik, chcę jednorazowo zmienić kwotę przychodu/wydatku (np. większa wypłata w lipcu), bez wpływu na domyślne kwoty w pozostałych miesiącach.
+- Jako planujący budżet, chcę mieć ograniczony wgląd maksymalnie na 3 miesiące do przodu, aby skupić się na realnej perspektywie najbliższego kwartału.
