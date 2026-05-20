@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { useMonthNavigation } from '../../hooks/useMonthNavigation';
@@ -25,6 +25,8 @@ export default function DashboardScreen() {
   const { incomes, fixedExpenses, accounts, liabilities, sinkingFunds, toggleLiabilityPayment, toggleFixedExpensePayment, toggleSinkingFundPayment, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
+
+  useFocusEffect(useCallback(() => { recordNetWorthSnapshot(); }, []));
 
   const {
     activeMonth,

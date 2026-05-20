@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { View, Text } from 'react-native';
 import Svg, { Path, Defs, LinearGradient, Stop, Line, Circle } from 'react-native-svg';
 
@@ -24,6 +24,7 @@ export default function LineChart({
   symbol = '',
   formatLabel,
 }: LineChartProps) {
+  const uid = useId();
   if (data.length < 2) {
     return (
       <View style={{ height, justifyContent: 'center', alignItems: 'center' }}>
@@ -75,7 +76,7 @@ export default function LineChart({
     <View>
       <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <Defs>
-          <LinearGradient id={`lg-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+          <LinearGradient id={`lg-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={color} stopOpacity="0.25" />
             <Stop offset="1" stopColor={color} stopOpacity="0" />
           </LinearGradient>
@@ -90,7 +91,7 @@ export default function LineChart({
 
         {/* Gradient fill */}
         {showGradient && (
-          <Path d={fillPath} fill={`url(#lg-${color.replace('#','')})`} />
+          <Path d={fillPath} fill={`url(#lg-${uid})`} />
         )}
 
         {/* Line */}

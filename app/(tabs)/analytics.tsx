@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { useBudgetStore, CURRENCY_SYMBOLS, getTrendData, getForecastData, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import LineChart from '../../components/charts/LineChart';
@@ -8,6 +9,8 @@ import { TrendingUp, TrendingDown, BarChart2, Zap } from 'lucide-react-native';
 
 export default function AnalyticsScreen() {
   const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
+
+  useFocusEffect(useCallback(() => { recordNetWorthSnapshot(); }, []));
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
 
