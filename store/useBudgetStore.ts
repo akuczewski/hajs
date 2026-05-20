@@ -51,6 +51,20 @@ export const getMonthRange = (fromMonth: string, count: number, direction: 'back
   });
 };
 
+// For variable income: return 3-month average if 3+ months of override history exist,
+// otherwise fall back to base amount. Used for forecasting only.
+export const getVariableIncomeProjection = (income: Income, asOfMonth: string): number => {
+  if (income.isFixed || !income.overrides) return income.amount;
+  const [y, m] = asOfMonth.split('-').map(Number);
+  const pastMonths = Array.from({ length: 3 }, (_, i) => {
+    const d = new Date(y, m - 2 - i, 1);
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+  });
+  const values = pastMonths.map(mo => income.overrides![mo]).filter((v): v is number => v !== undefined);
+  if (values.length < 3) return income.amount;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+};
+
 // Income vs Expenses trend for last N months — computed from existing store data
 export const getTrendData = (
   incomes: Income[],
@@ -68,7 +82,7 @@ export const getTrendData = (
       sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0),
   }));
 
-// Cashflow forecast for next N months
+// Cashflow forecast for next N months — variable income uses 3-month average if available
 export const getForecastData = (
   incomes: Income[],
   fixedExpenses: FixedExpense[],
@@ -76,9 +90,11 @@ export const getForecastData = (
   sinkingFunds: SinkingFund[],
   months: string[]
 ): { month: string; surplus: number; cumulative: number }[] => {
+  const currentMonth = new Date().toISOString().slice(0, 7);
   let cumulative = 0;
   return months.map(month => {
-    const income = incomes.reduce((acc, i) => acc + getIncomeAmount(i, month), 0);
+    const income = incomes.reduce((acc, i) =>
+      acc + (i.isFixed ? getIncomeAmount(i, month) : getVariableIncomeProjection(i, currentMonth)), 0);
     const expenses =
       fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, month), 0) +
       liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, month), 0) +

@@ -4,7 +4,7 @@ import { Briefcase, Activity, CheckCircle, Plus, Trash2, CalendarDays, Pencil, C
 import Svg, { Path } from 'react-native-svg';
 import {
   useBudgetStore, CURRENCY_SYMBOLS,
-  getIncomeAmount, getExpenseAmount, getLiabilityAmount
+  getIncomeAmount, getExpenseAmount, getLiabilityAmount, getVariableIncomeProjection
 } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { useMonthNavigation } from '../../hooks/useMonthNavigation';
@@ -264,6 +264,8 @@ export default function CashflowScreen() {
             {variableIncomes.length === 0 && <Text className="text-zinc-600 mb-6 px-1">{t('cashflow.noVariableIncomes')}</Text>}
             {variableIncomes.map(inc => {
               const currentAmt = getIncomeAmount(inc, activeMonth);
+              const projection = getVariableIncomeProjection(inc, activeMonth);
+              const hasAverage = projection !== inc.amount;
               return (
                 <View key={inc.id} className="bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-5 mb-4 relative overflow-hidden">
                   <View className="flex-row justify-between items-center mb-4">
@@ -292,8 +294,15 @@ export default function CashflowScreen() {
                       <Text className="text-zinc-600 text-[10px] mt-1">{t('cashflow.last5Months')}</Text>
                     </View>
                     <View className="items-end">
-                      <Text className="text-zinc-400 text-xs font-medium">{t('cashflow.calculatedAverage')}</Text>
-                      <Text className="text-[#34D399] font-bold text-lg">{symbol}{inc.amount}/mo</Text>
+                      <Text className="text-zinc-400 text-xs font-medium">
+                        {hasAverage ? t('cashflow.calculatedAverage') : t('cashflow.baseAmount')}
+                      </Text>
+                      <Text className="text-[#34D399] font-bold text-lg">
+                        {symbol}{Math.round(projection).toLocaleString()}/mo
+                      </Text>
+                      {hasAverage && (
+                        <Text className="text-zinc-600 text-[10px]">{t('cashflow.last3MonthsAvg')}</Text>
+                      )}
                     </View>
                   </View>
                 </View>
