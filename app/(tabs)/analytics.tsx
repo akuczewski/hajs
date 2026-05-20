@@ -13,7 +13,7 @@ import BarChart from '../../components/charts/BarChart';
 import { TrendingUp, TrendingDown, BarChart2, Zap } from 'lucide-react-native';
 
 export default function AnalyticsScreen() {
-  const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory, recordNetWorthSnapshot } = useBudgetStore();
+  const { incomes, fixedExpenses, liabilities, sinkingFunds, accounts, currency, netWorthHistory, recordNetWorthSnapshot, activeMonth } = useBudgetStore();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -29,11 +29,11 @@ export default function AnalyticsScreen() {
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
-  // Monthly surplus — identical formula to Dashboard "free funds" so both screens are in sync
-  const totalIncome = incomes.reduce((acc, i) => acc + getIncomeAmount(i, currentMonth), 0);
+  // Monthly surplus — uses activeMonth (same as Dashboard) so both screens always match
+  const totalIncome = incomes.reduce((acc, i) => acc + getIncomeAmount(i, activeMonth), 0);
   const totalObligations =
-    fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, currentMonth), 0) +
-    liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, currentMonth), 0) +
+    fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, activeMonth), 0) +
+    liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, activeMonth), 0) +
     sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0);
   const currentSurplus = totalIncome - totalObligations;
 
