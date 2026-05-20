@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, SafeAreaView } from 'react-native';
 import { Briefcase, Activity, CheckCircle, Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
-import { useBudgetStore, CURRENCY_SYMBOLS, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import EditAmountModal from '../../components/EditAmountModal';
 
@@ -41,6 +41,8 @@ export default function CashflowScreen() {
   const isCurrentMonth = activeMonth === currentDateStr;
   const isPastMonth = activeMonth < currentDateStr;
   const isFutureMonth = activeMonth > currentDateStr;
+  
+  const isMaxFutureReached = isMaxFutureMonthReached(activeMonth, currentDateStr, 3);
 
   const handlePrevMonth = () => {
     const [year, month] = activeMonth.split('-');
@@ -151,8 +153,11 @@ export default function CashflowScreen() {
             <TouchableOpacity onPress={handlePrevMonth} className="bg-[#1C1F22] p-2 rounded-full border border-[#272A2E]">
               <ChevronLeft color="#A1A1AA" size={20} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleNextMonth} className="bg-[#1C1F22] p-2 rounded-full border border-[#272A2E]">
-              <ChevronRight color="#A1A1AA" size={20} />
+            <TouchableOpacity 
+              onPress={isMaxFutureReached ? undefined : handleNextMonth} 
+              className={`bg-[#1C1F22] p-2 rounded-full border border-[#272A2E] ${isMaxFutureReached ? 'opacity-30' : ''}`}
+            >
+              <ChevronRight color={isMaxFutureReached ? "#52525B" : "#A1A1AA"} size={20} />
             </TouchableOpacity>
           </View>
         </View>

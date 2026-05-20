@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, isMaxFutureMonthReached } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
@@ -41,6 +41,8 @@ export default function DashboardScreen() {
   const isCurrentMonth = activeMonth === currentDateStr;
   const isPastMonth = activeMonth < currentDateStr;
   const isFutureMonth = activeMonth > currentDateStr;
+  
+  const isMaxFutureReached = isMaxFutureMonthReached(activeMonth, currentDateStr, 3);
 
   const getMonthName = (monthStr: string) => {
     const num = parseInt(monthStr.split('-')[1]);

@@ -38,6 +38,16 @@ export const getLiabilityAmount = (liability: Liability, month: string) => {
   return liability.overrides?.[month] !== undefined ? liability.overrides[month] : liability.monthlyPayment;
 };
 
+export const isMaxFutureMonthReached = (activeMonth: string, currentMonth: string, limit: number = 3) => {
+  const [activeYear, activeM] = activeMonth.split('-').map(Number);
+  const [currentYear, currentM] = currentMonth.split('-').map(Number);
+  
+  const activeTotalMonths = activeYear * 12 + activeM;
+  const currentTotalMonths = currentYear * 12 + currentM;
+  
+  return (activeTotalMonths - currentTotalMonths) >= limit;
+};
+
 export const useBudgetStore = create<AppState>()(
   persist(
     (set, get) => ({
