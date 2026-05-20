@@ -1,7 +1,11 @@
 import React, { useCallback } from 'react';
 import { View, Text, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { useBudgetStore, CURRENCY_SYMBOLS, getTrendData, getForecastData, getMonthRange } from '../../store/useBudgetStore';
+import {
+  useBudgetStore, CURRENCY_SYMBOLS,
+  getTrendData, getForecastData, getMonthRange,
+  getIncomeAmount, getExpenseAmount, getLiabilityAmount, calculateMonthlyRequired,
+} from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import LineChart from '../../components/charts/LineChart';
 import BarChart from '../../components/charts/BarChart';
@@ -16,13 +20,28 @@ export default function AnalyticsScreen() {
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
+  // Current month surplus — same formula as Dashboard "free funds"
+  const totalIncome = incomes.reduce((acc, i) => acc + getIncomeAmount(i, currentMonth), 0);
+  const totalObligations =
+    fixedExpenses.reduce((acc, e) => acc + getExpenseAmount(e, currentMonth), 0) +
+    liabilities.reduce((acc, l) => acc + getLiabilityAmount(l, currentMonth), 0) +
+    sinkingFunds.reduce((acc, s) => acc + calculateMonthlyRequired(s), 0);
+  const currentSurplus = totalIncome - totalObligations;
+
+  // Next 11 months forecast (using 3-month avg for variable income when available)
+  const forecastMonths = getMonthRange(currentMonth, 11, 'forward');
+  const forecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, forecastMonths);
+
+  // Cumulative chart: current month as point 0, then +11 projected months = 12 total
+  const cumulativeChartData = [
+    { month: currentMonth, value: currentSurplus },
+    ...forecastData.map(d => ({ month: d.month, value: currentSurplus + d.cumulative })),
+  ];
+  const totalCumulative = cumulativeChartData[cumulativeChartData.length - 1]?.value ?? currentSurplus;
+
   // Last 12 months trend
   const trendMonths = getMonthRange(currentMonth, 12);
   const trendData = getTrendData(incomes, fixedExpenses, liabilities, sinkingFunds, trendMonths);
-
-  // Next 12 months forecast
-  const forecastMonths = getMonthRange(currentMonth, 12, 'forward');
-  const forecastData = getForecastData(incomes, fixedExpenses, liabilities, sinkingFunds, forecastMonths);
 
   // Net Worth history data
   const nwMonths = getMonthRange(currentMonth, 12);
@@ -36,8 +55,6 @@ export default function AnalyticsScreen() {
     ? nwData
     : [...nwData, { month: currentMonth, value: liveNW }];
 
-  const lastSurplus = forecastData[0]?.surplus ?? 0;
-  const totalCumulative = forecastData[forecastData.length - 1]?.cumulative ?? 0;
   const avgIncome = trendData.reduce((a, d) => a + d.income, 0) / Math.max(1, trendData.length);
   const avgExpenses = trendData.reduce((a, d) => a + d.expenses, 0) / Math.max(1, trendData.length);
 
@@ -66,8 +83,8 @@ export default function AnalyticsScreen() {
         <View className="flex-row gap-3 mb-6">
           <View className="flex-1 bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-4">
             <Text className="text-zinc-500 text-xs font-medium mb-1">{t('analytics.surplus')}</Text>
-            <Text className={`text-xl font-extrabold ${lastSurplus >= 0 ? 'text-[#34D399]' : 'text-red-400'}`}>
-              {lastSurplus >= 0 ? '+' : '-'}{fmt(lastSurplus)}
+            <Text className={`text-xl font-extrabold ${currentSurplus >= 0 ? 'text-[#34D399]' : 'text-red-400'}`}>
+              {currentSurplus >= 0 ? '+' : '-'}{fmt(currentSurplus)}
             </Text>
           </View>
           <View className="flex-1 bg-[#1C1F22] border border-[#272A2E] rounded-2xl p-4">
@@ -151,7 +168,7 @@ export default function AnalyticsScreen() {
           <Text className="text-zinc-500 text-xs mb-4">{t('analytics.forecastDesc')}</Text>
 
           <LineChart
-            data={forecastData.map(d => ({ month: d.month, value: d.cumulative }))}
+            data={cumulativeChartData}
             color={totalCumulative >= 0 ? '#8B5CF6' : '#EF4444'}
             height={130}
             showGradient
@@ -162,8 +179,8 @@ export default function AnalyticsScreen() {
           <View className="mt-4 bg-[#111315] rounded-xl p-4 border border-[#272A2E]">
             <View className="flex-row justify-between items-center">
               <Text className="text-zinc-400 text-sm">{t('analytics.surplus')}/mo</Text>
-              <Text className={`font-extrabold text-lg ${lastSurplus >= 0 ? 'text-[#34D399]' : 'text-red-400'}`}>
-                {lastSurplus >= 0 ? '+' : ''}{symbol}{Math.round(lastSurplus).toLocaleString()}
+              <Text className={`font-extrabold text-lg ${currentSurplus >= 0 ? 'text-[#34D399]' : 'text-red-400'}`}>
+                {currentSurplus >= 0 ? '+' : ''}{symbol}{Math.round(currentSurplus).toLocaleString()}
               </Text>
             </View>
             <View className="flex-row justify-between items-center mt-2">
