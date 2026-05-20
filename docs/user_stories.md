@@ -22,3 +22,18 @@
 - Jako użytkownik, chcę przełączać się między miesiącami i widzieć przeszłe lub przyszłe kwoty wolne do wydania.
 - Jako użytkownik, chcę jednorazowo zmienić kwotę przychodu/wydatku (np. większa wypłata w lipcu), bez wpływu na domyślne kwoty w pozostałych miesiącach.
 - Jako planujący budżet, chcę mieć ograniczony wgląd maksymalnie na 3 miesiące do przodu, aby skupić się na realnej perspektywie najbliższego kwartału.
+
+## Epic 7: Zarządzanie Danymi
+- Jako użytkownik, chcę móc usunąć cel oszczędnościowy (Sinking Fund), który przestał być aktualny.
+- Jako użytkownik, chcę móc edytować nazwę i kategorię istniejącego przychodu, wydatku lub zobowiązania bez konieczności usuwania go i dodawania od nowa.
+- Jako użytkownik, chcę móc zresetować całą aplikację do stanu pustego (np. na początku nowego roku budżetowego), z potwierdzeniem przed usunięciem danych.
+
+## Epic 8: Analityka i Wykresy
+- Jako użytkownik, chcę widzieć wykres Net Worth na przestrzeni ostatnich 12 miesięcy na ekranie głównym, aby śledzić trend wzrostu lub spadku mojego majątku.
+- Jako użytkownik, chcę widzieć wykres Przychód vs. Wydatki za ostatnie 12 miesięcy, aby zrozumieć sezonowość i trendy w moich finansach.
+- Jako użytkownik, chcę widzieć prognozę cashflow na najbliższe 12 miesięcy — wykres pokazujący skumulowane środki lub deficyt przy obecnych przychodach i wydatkach.
+- Jako oszczędzający, chcę widzieć dla każdego Sinking Fundu szacowaną datę "break-even" — kiedy cel zostanie osiągnięty przy obecnym tempie odkładania, nawet jeśli odbiega od daty docelowej.
+
+## Epic 9: Personalizacja i UX
+- Jako użytkownik, chcę móc zmieniać kolejność pozycji na miesięcznym checkliście i w listach przychodów/wydatków poprzez drag & drop.
+- Jako użytkownik mobilny, chcę widzieć Net Worth i wolne środki na widgecie ekranu głównego iOS, bez konieczności otwierania aplikacji.

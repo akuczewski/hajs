@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-20
+
+### Added
+- **Delete Sinking Fund**: Users can now delete savings goals (Sinking Funds) directly from the Goals tab via a trash icon — previously there was no way to remove a goal.
+- **Reset App**: Implemented the previously non-functional "Clear all data" button in Settings. Triggers a confirmation Alert and wipes all user data (incomes, expenses, goals, liabilities, accounts) while preserving language and currency preferences.
+- **`useMonthNavigation` hook** (`hooks/useMonthNavigation.ts`): Centralised shared hook encapsulating all month navigation logic — `handlePrevMonth`, `handleNextMonth`, `handleToday`, `getMonthName`, and swipe `PanResponder`. Eliminates duplicated code across Dashboard and Cashflow screens.
+- **CLAUDE.md**: Added project-level documentation for AI-assisted development — covers architecture, data model, colour system, known issues table, and coding conventions.
+
+### Fixed
+- **English UI broken**: ~20 translation keys present in Polish (`cashflow.*`, `savings.*`, `settings.*`) were entirely missing from the English translations. The `t()` fallback was returning raw key paths (e.g. `cashflow.editAmount`) instead of text. All keys are now present in both languages.
+- **Hardcoded Polish strings**: Two strings in Dashboard (`index.tsx`) bypassed the i18n system and were hardcoded in Polish regardless of the selected language — `"Brak rachunków w tym miesiącu!"` and `"Nie dodano jeszcze żadnych aktywów. Przejdź do zakładki Savings."`. Both now use `t()` keys.
+- **Savings tab labels not translated**: The ASSETS / GOALS tab buttons in `savings.tsx` were hardcoded strings instead of `t('savings.assetsTab')` / `t('savings.goalsTab')`.
+- **Edit Asset modal title**: The edit modal in the Savings screen showed "New Asset" (`savings.newAsset`) as its title. Now shows "Edit Asset" (`savings.editAsset`).
+- **New account currency hardcoded**: When adding a new account, `currency` was hardcoded to `'PLN'` regardless of the active store currency. Now uses the current `currency` from the store.
+- **Duplicate empty-state in Dashboard checklist**: Two consecutive `checklistItems.length === 0` checks rendered potentially conflicting empty states. Reduced to a single conditional render.
+- **Seed data in Polish**: Initial demo data (`"Wypłata UoP"`, `"Czynsz"`, `"Konto Główne"`, `"Gotówka"`) was in Polish, confusing English-language users on first install. Replaced with neutral English names: `Salary`, `Rent`, `Main Account`, `Cash`.
+- **Default expense category hardcoded**: When saving a Fixed Expense without a category, the fallback was hardcoded `'Inne'` (Polish). Now uses `t('cashflow.categoryOther')`.
+
+### Removed
+- **`Income.history` legacy field**: Removed the deprecated `history?: { month: string; amount: number }[]` field from the `Income` interface and all store seed data. The `overrides` map replaced this pattern in v1.1.0.
+- **Dead `calculateMonthly` function**: Removed an unused local function in `savings.tsx` that duplicated (incorrectly) the logic of `calculateMonthlyRequired` from the store.
+
+### Refactored
+- `app/(tabs)/index.tsx` — uses `useMonthNavigation` hook; removed ~40 lines of duplicated navigation logic.
+- `app/(tabs)/cashflow.tsx` — uses `useMonthNavigation` hook; removed ~40 lines of duplicated navigation logic; removed `history: []` from `addIncome` call.
+- `app/(tabs)/savings.tsx` — full i18n pass; added `deleteSinkingFund`; fixed account currency; removed dead code.
+- `store/types.ts` — removed `Income.history`; added `deleteSinkingFund` and `resetApp` to `AppState`.
+- `store/useBudgetStore.ts` — added `deleteSinkingFund` and `resetApp` actions; neutralised seed data.
+
 ## [1.1.0] - 2026-05-20
 
 ### Added
