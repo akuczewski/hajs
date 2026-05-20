@@ -40,10 +40,20 @@ export default function AnalyticsScreen() {
   ];
   const totalCumulative = cumulativeChartData[cumulativeChartData.length - 1]?.value ?? currentSurplus;
 
-  // Last 12 months trend
-  const trendMonths = getMonthRange(currentMonth, 12);
+  // Last 6 months — month has "real" data if any income/expense has an override for it
+  const hasDataForMonth = (month: string) =>
+    month === currentMonth ||
+    incomes.some(i => i.overrides?.[month] !== undefined) ||
+    fixedExpenses.some(e => e.overrides?.[month] !== undefined) ||
+    liabilities.some(l => l.overrides?.[month] !== undefined);
+
+  const trendMonths = getMonthRange(currentMonth, 6);
   const trendData = getTrendData(incomes, fixedExpenses, liabilities, sinkingFunds, trendMonths)
-    .map(d => ({ ...d, isCurrentMonth: d.month === currentMonth }));
+    .map(d => ({
+      ...d,
+      isCurrentMonth: d.month === currentMonth,
+      isEstimated: d.month < currentMonth && !hasDataForMonth(d.month),
+    }));
 
   // 3-month forecast bars — same logic as getForecastData but income/expenses split
   const forecastBarMonths = getMonthRange(currentMonth, 3, 'forward');

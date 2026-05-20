@@ -8,6 +8,7 @@ interface BarDataPoint {
   expenses: number;
   isForecast?: boolean;
   isCurrentMonth?: boolean;
+  isEstimated?: boolean;
 }
 
 interface BarChartProps {
@@ -82,25 +83,27 @@ export default function BarChart({
           const expH = toBarH(d.expenses);
           const incX = slotX - gap / 2 - barW;
           const expX = slotX + gap / 2;
-          const opacity = d.isForecast ? 0.38 : d.isCurrentMonth ? 1 : 0.75;
+          const isGrey = d.isForecast || d.isEstimated;
+          const opacity = d.isForecast ? 0.38 : d.isEstimated ? 0.28 : d.isCurrentMonth ? 1 : 0.8;
+          const barHeight = d.isEstimated ? Math.max(chartH * 0.15, 4) : undefined;
 
           return (
             <React.Fragment key={d.month}>
               <Rect
                 x={incX}
-                y={PAD_TOP + chartH - incH}
+                y={PAD_TOP + chartH - (d.isEstimated ? barHeight! : incH)}
                 width={barW}
-                height={Math.max(incH, 1)}
-                fill={d.isForecast ? '#6B7280' : incomeColor}
+                height={d.isEstimated ? barHeight! : Math.max(incH, 1)}
+                fill={isGrey ? '#6B7280' : incomeColor}
                 rx="2"
                 opacity={opacity}
               />
               <Rect
                 x={expX}
-                y={PAD_TOP + chartH - expH}
+                y={PAD_TOP + chartH - (d.isEstimated ? barHeight! : expH)}
                 width={barW}
-                height={Math.max(expH, 1)}
-                fill={d.isForecast ? '#9CA3AF' : expenseColor}
+                height={d.isEstimated ? barHeight! : Math.max(expH, 1)}
+                fill={isGrey ? '#6B7280' : expenseColor}
                 rx="2"
                 opacity={opacity}
               />
