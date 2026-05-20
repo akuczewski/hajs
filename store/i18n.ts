@@ -35,8 +35,10 @@ export const translations: Translations = {
       netWorthTrend: "Net Worth History",
       incomeTrend: "Income vs Expenses",
       last12months: "Last 12 months",
+      last6monthsForecast: "Last 6 months + 3-month forecast",
       forecast: "Cashflow Forecast",
       forecastDesc: "Next 12 months at current rates",
+      forecastLabel: "Forecast",
       noHistory: "No history yet. Update your account balances regularly.",
       onTrack: "On track",
       behind: "Behind schedule",
@@ -44,7 +46,7 @@ export const translations: Translations = {
       behindBy: "months behind",
       estimatedDone: "Est. completion",
       surplus: "Monthly surplus",
-      cumulative: "Cumulative savings",
+      cumulative: "12m cumulative savings",
       income: "Income",
       expenses: "Expenses"
     },
@@ -167,31 +169,6 @@ export const translations: Translations = {
       resetAppConfirm: "Are you sure? This will permanently delete all your data — accounts, incomes, expenses, goals and payment history.",
       delete: "Delete everything"
     },
-    analytics: {
-      title: "Analytics",
-      netWorthTrend: "Net Worth History",
-      incomeTrend: "Income vs Expenses",
-      last12months: "Last 12 months",
-      forecast: "Cashflow Forecast",
-      forecastDesc: "Next 12 months at current rates",
-      noHistory: "No history yet. Update your account balances regularly.",
-      onTrack: "On track",
-      behind: "Behind schedule",
-      ahead: "months ahead",
-      behindBy: "months behind",
-      estimatedDone: "Est. completion",
-      surplus: "Monthly surplus",
-      cumulative: "Cumulative savings",
-      income: "Income",
-      expenses: "Expenses"
-    },
-    tabs: {
-      dashboard: "Dashboard",
-      cashflow: "Cashflow",
-      savings: "Savings",
-      settings: "Settings",
-      analytics: "Analytics"
-    }
   },
   pl: {
     months: {
@@ -220,7 +197,9 @@ export const translations: Translations = {
       netWorthTrend: "Historia Majątku",
       incomeTrend: "Przychody vs Wydatki",
       last12months: "Ostatnie 12 miesięcy",
+      last6monthsForecast: "Ostatnie 6 mies. + prognoza 3 mies.",
       forecast: "Prognoza Cashflow",
+      forecastLabel: "Prognoza",
       forecastDesc: "Najbliższe 12 miesięcy przy obecnych stawkach",
       noHistory: "Brak historii. Regularnie aktualizuj salda kont.",
       onTrack: "Na czasie",
@@ -229,7 +208,7 @@ export const translations: Translations = {
       behindBy: "mies. po terminie",
       estimatedDone: "Szac. ukończenie",
       surplus: "Nadwyżka miesięczna",
-      cumulative: "Skumulowane oszczędności",
+      cumulative: "Skumul. oszczędności 12m",
       income: "Przychody",
       expenses: "Wydatki"
     },

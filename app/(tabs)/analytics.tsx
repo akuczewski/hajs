@@ -157,7 +157,7 @@ export default function AnalyticsScreen() {
             <BarChart2 color="#3B82F6" size={18} />
             <Text className="text-white font-bold text-base ml-2">{t('analytics.incomeTrend')}</Text>
           </View>
-          <Text className="text-zinc-500 text-xs mb-4">{t('analytics.last12months')}</Text>
+          <Text className="text-zinc-500 text-xs mb-4">{t('analytics.last6monthsForecast')}</Text>
 
           {/* Legend */}
           <View className="flex-row gap-4 mb-3 flex-wrap">
@@ -171,11 +171,11 @@ export default function AnalyticsScreen() {
             </View>
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-sm bg-[#6B7280] mr-1 opacity-50" />
-              <Text className="text-zinc-500 text-xs">{t('analytics.forecast')}</Text>
+              <Text className="text-zinc-500 text-xs">{t('analytics.forecastLabel')}</Text>
             </View>
           </View>
 
-          <BarChart data={barChartData} height={148} />
+          <BarChart data={barChartData} height={148} formatLabel={getMonthLabel} />
 
           {/* Averages */}
           <View className="flex-row gap-3 mt-4">

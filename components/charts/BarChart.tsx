@@ -16,6 +16,7 @@ interface BarChartProps {
   height?: number;
   incomeColor?: string;
   expenseColor?: string;
+  formatLabel?: (month: string) => string;
 }
 
 export default function BarChart({
@@ -23,6 +24,7 @@ export default function BarChart({
   height = 140,
   incomeColor = '#34D399',
   expenseColor = '#EAB308',
+  formatLabel,
 }: BarChartProps) {
   if (data.length === 0) return null;
 
@@ -45,8 +47,9 @@ export default function BarChart({
   const toBarH = (v: number) => (v / maxV) * chartH;
 
   const formatM = (m: string) => {
+    if (formatLabel) return formatLabel(m);
     const [, month] = m.split('-');
-    return ['J','F','M','A','M','J','J','A','S','O','N','D'][parseInt(month) - 1];
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(month) - 1];
   };
 
   const step = data.length > 10 ? 3 : data.length > 6 ? 2 : 1;
