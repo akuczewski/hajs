@@ -58,7 +58,7 @@ export default function AnalyticsScreen() {
   const avgIncome = trendData.reduce((a, d) => a + d.income, 0) / Math.max(1, trendData.length);
   const avgExpenses = trendData.reduce((a, d) => a + d.expenses, 0) / Math.max(1, trendData.length);
 
-  const fmt = (v: number) => `${symbol}${Math.round(Math.abs(v)).toLocaleString()}`;
+  const fmt = (v: number) => `${symbol}${Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const getMonthLabel = (m: string) => {
     const [, month] = m.split('-');
@@ -110,7 +110,7 @@ export default function AnalyticsScreen() {
           ) : (
             <TouchableOpacity onPress={recordNetWorthSnapshot} activeOpacity={0.85}>
               <Text className="text-[#34D399] text-2xl font-extrabold mb-3">
-                {symbol}{liveNW.toLocaleString()}
+                {symbol}{liveNW.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
               <LineChart
                 data={nwDataWithLive}
@@ -180,13 +180,13 @@ export default function AnalyticsScreen() {
             <View className="flex-row justify-between items-center">
               <Text className="text-zinc-400 text-sm">{t('analytics.surplus')}/mo</Text>
               <Text className={`font-extrabold text-lg ${currentSurplus >= 0 ? 'text-[#34D399]' : 'text-red-400'}`}>
-                {currentSurplus >= 0 ? '+' : ''}{symbol}{Math.round(currentSurplus).toLocaleString()}
+                {currentSurplus >= 0 ? '+' : ''}{symbol}{(currentSurplus).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
             </View>
             <View className="flex-row justify-between items-center mt-2">
               <Text className="text-zinc-400 text-sm">12m {t('analytics.cumulative')}</Text>
               <Text className={`font-extrabold text-lg ${totalCumulative >= 0 ? 'text-[#3B82F6]' : 'text-red-400'}`}>
-                {totalCumulative >= 0 ? '+' : ''}{symbol}{Math.round(totalCumulative).toLocaleString()}
+                {totalCumulative >= 0 ? '+' : ''}{symbol}{(totalCumulative).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
             </View>
           </View>

@@ -17,6 +17,9 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   GBP: '£'
 };
 
+export const fmtAmount = (value: number): string =>
+  value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export const calculateMonthlyRequired = (fund: SinkingFund) => {
   const targetYear = parseInt(fund.deadline.split('-')[0]) || new Date().getFullYear();
   const targetMonth = parseInt(fund.deadline.split('-')[1]) || new Date().getMonth() + 1;

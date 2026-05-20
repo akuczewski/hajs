@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, getMonthRange } from '../../store/useBudgetStore';
+import { useBudgetStore, CURRENCY_SYMBOLS, fmtAmount, calculateMonthlyRequired, getIncomeAmount, getExpenseAmount, getLiabilityAmount, getMonthRange } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
 import { useMonthNavigation } from '../../hooks/useMonthNavigation';
-import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays, Home, Car, Settings } from 'lucide-react-native';
+import { Wallet, Bitcoin, Landmark, CheckCircle, Circle, ArrowRight, ShieldCheck, Banknote, Coins, LineChart, CalendarDays, Home, Car, Settings, PiggyBank } from 'lucide-react-native';
 import NWLineChart from '../../components/charts/LineChart';
 import { AccountType } from '../../store/types';
 
@@ -33,9 +33,6 @@ export default function DashboardScreen() {
     isCurrentMonth,
     isPastMonth,
     isFutureMonth,
-    isMaxFutureReached,
-    handlePrevMonth,
-    handleNextMonth,
     handleToday,
     getMonthName,
     swipePanResponder,
@@ -44,35 +41,40 @@ export default function DashboardScreen() {
   const totalIncome = incomes.reduce((acc, curr) => acc + getIncomeAmount(curr, activeMonth), 0);
   const totalNetWorth = accounts.reduce((acc, curr) => acc + curr.balance, 0);
 
-  const checklistItems = [
+  // Bills checklist: fixed expenses + liabilities only
+  const billItems = [
     ...fixedExpenses.map(exp => ({
       id: exp.id,
       kind: 'FIXED' as const,
       name: exp.name,
       amount: getExpenseAmount(exp, activeMonth),
-      isPaid: exp.paymentHistory?.includes(activeMonth) || false
+      isPaid: exp.paymentHistory?.includes(activeMonth) || false,
     })),
     ...liabilities.map(lib => ({
       id: lib.id,
       kind: 'LIABILITY' as const,
       name: lib.name,
       amount: getLiabilityAmount(lib, activeMonth),
-      isPaid: lib.paymentHistory?.includes(activeMonth) || false
+      isPaid: lib.paymentHistory?.includes(activeMonth) || false,
     })),
-    ...sinkingFunds.map(s => ({
-      id: s.id,
-      kind: 'GOAL' as const,
-      name: s.name,
-      amount: calculateMonthlyRequired(s),
-      isPaid: (s.paymentHistory || []).includes(activeMonth)
-    }))
   ].sort((a, b) => b.amount - a.amount);
 
-  const paidItemsCount = checklistItems.filter(item => item.isPaid).length;
-  const totalItemsCount = checklistItems.length;
-  const progressPercent = totalItemsCount > 0 ? (paidItemsCount / totalItemsCount) * 100 : 0;
-  const totalMonthlyObligations = checklistItems.reduce((acc, curr) => acc + curr.amount, 0);
-  const safeToSpend = totalIncome > totalMonthlyObligations ? totalIncome - totalMonthlyObligations : 0;
+  // Goals checklist: sinking funds
+  const goalItems = sinkingFunds.map(s => ({
+    id: s.id,
+    name: s.name,
+    amount: calculateMonthlyRequired(s),
+    isPaid: (s.paymentHistory || []).includes(activeMonth),
+  })).sort((a, b) => b.amount - a.amount);
+
+  const allItems = [...billItems, ...goalItems];
+  const paidCount = allItems.filter(i => i.isPaid).length;
+  const progressPercent = allItems.length > 0 ? (paidCount / allItems.length) * 100 : 0;
+
+  const totalBills = billItems.reduce((acc, i) => acc + i.amount, 0);
+  const totalGoals = goalItems.reduce((acc, i) => acc + i.amount, 0);
+  const totalObligations = totalBills + totalGoals;
+  const safeToSpend = totalIncome > totalObligations ? totalIncome - totalObligations : 0;
 
   return (
     <SafeAreaView className="flex-1 bg-[#111315]">
@@ -90,7 +92,7 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
           <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">
-            {symbol}{totalNetWorth.toLocaleString()}
+            {symbol}{fmtAmount(totalNetWorth)}
           </Text>
         </View>
 
@@ -141,7 +143,7 @@ export default function DashboardScreen() {
             : [...nwData, { month: currentMonth, value: totalNetWorth }];
           if (withLive.length < 2) return (
             <TouchableOpacity onPress={recordNetWorthSnapshot} className="h-28 w-full px-5 -mt-2 justify-end pb-2">
-              <Text className="text-zinc-700 text-xs text-center">Update balances regularly to build your Net Worth chart</Text>
+              <Text className="text-zinc-700 text-xs text-center">{t('dashboard.buildNwChart')}</Text>
             </TouchableOpacity>
           );
           return (
@@ -152,19 +154,19 @@ export default function DashboardScreen() {
         })()}
 
         {/* Pay Yourself First */}
-        <View className="px-5 mb-8">
+        <View className="px-5 mb-6">
           <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6">
             <Text className="text-white text-xl font-bold mb-2">{t('dashboard.payYourselfFirst')}</Text>
             <Text className="text-zinc-400 text-sm mb-4">{t('dashboard.payYourselfDesc')}</Text>
             <View className="bg-[#111315] p-4 rounded-2xl flex-row justify-between items-center border border-[#272A2E]">
               <Text className="text-zinc-500 font-bold">{t('dashboard.freeFunds')}</Text>
-              <Text className="text-[#F59E0B] font-extrabold text-2xl">{symbol}{safeToSpend.toLocaleString()}</Text>
+              <Text className="text-[#F59E0B] font-extrabold text-2xl">{symbol}{fmtAmount(safeToSpend)}</Text>
             </View>
           </View>
         </View>
 
-        {/* Monthly Checklist */}
-        <View className="mb-8 px-5">
+        {/* Monthly Bills Checklist */}
+        <View className="mb-6 px-5">
           <View className="mb-4">
             <Text className="text-white text-xl font-bold">{t('dashboard.toPayThisMonth')}</Text>
             <Text className="text-zinc-500 text-xs mt-1">{t('dashboard.markAsPaid')}</Text>
@@ -174,31 +176,64 @@ export default function DashboardScreen() {
             <View className="h-full bg-[#34D399] rounded-full" style={{ width: `${progressPercent}%` }} />
           </View>
 
-          {checklistItems.length === 0 ? (
+          {billItems.length === 0 ? (
             <Text className="text-zinc-500 text-center py-4">{t('dashboard.noBills')}</Text>
           ) : (
-            checklistItems.map(item => (
+            billItems.map(item => (
               <TouchableOpacity
                 key={item.id}
                 onPress={() => {
                   if (item.kind === 'FIXED') toggleFixedExpensePayment(item.id, activeMonth);
-                  else if (item.kind === 'LIABILITY') toggleLiabilityPayment(item.id, activeMonth);
-                  else if (item.kind === 'GOAL') toggleSinkingFundPayment(item.id, activeMonth);
+                  else toggleLiabilityPayment(item.id, activeMonth);
                 }}
                 className={`flex-row items-center justify-between p-4 mb-3 rounded-2xl border ${item.isPaid ? 'bg-[#1C1F22] border-[#272A2E]' : 'bg-[#262A2E] border-[#3F3F46]'}`}
               >
                 <View className="flex-row items-center">
-                  {item.isPaid ? (
-                    <CheckCircle color="#34D399" size={24} />
-                  ) : (
-                    <Circle color="#71717A" size={24} />
-                  )}
+                  {item.isPaid ? <CheckCircle color="#34D399" size={24} /> : <Circle color="#71717A" size={24} />}
                   <Text className={`font-bold text-base ml-3 ${item.isPaid ? 'text-zinc-500 line-through' : 'text-white'}`}>
                     {item.name}
                   </Text>
                 </View>
                 <Text className={`font-bold ${item.isPaid ? 'text-zinc-500 line-through' : 'text-yellow-500'}`}>
-                  {symbol}{item.amount.toLocaleString()}
+                  {symbol}{fmtAmount(item.amount)}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+
+        {/* Goals This Month */}
+        <View className="mb-8 px-5">
+          <View className="flex-row justify-between items-center mb-4">
+            <View>
+              <Text className="text-white text-xl font-bold">{t('dashboard.goalsThisMonth')}</Text>
+              <Text className="text-zinc-500 text-xs mt-1">{t('dashboard.markAsPaid')}</Text>
+            </View>
+            <View className="bg-[#8B5CF6]/15 px-3 py-1.5 rounded-xl border border-[#8B5CF6]/30">
+              <Text className="text-[#8B5CF6] font-extrabold text-sm">{symbol}{fmtAmount(totalGoals)}</Text>
+            </View>
+          </View>
+
+          {goalItems.length === 0 ? (
+            <Text className="text-zinc-500 text-center py-4">{t('dashboard.noGoals')}</Text>
+          ) : (
+            goalItems.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => toggleSinkingFundPayment(item.id, activeMonth)}
+                className={`flex-row items-center justify-between p-4 mb-3 rounded-2xl border ${item.isPaid ? 'bg-[#1C1F22] border-[#272A2E]' : 'bg-[#1A1525] border-[#3B2F5E]'}`}
+              >
+                <View className="flex-row items-center">
+                  {item.isPaid
+                    ? <CheckCircle color="#8B5CF6" size={24} />
+                    : <PiggyBank color="#8B5CF6" size={24} />
+                  }
+                  <Text className={`font-bold text-base ml-3 ${item.isPaid ? 'text-zinc-500 line-through' : 'text-white'}`}>
+                    {item.name}
+                  </Text>
+                </View>
+                <Text className={`font-bold ${item.isPaid ? 'text-zinc-500 line-through' : 'text-[#8B5CF6]'}`}>
+                  {symbol}{fmtAmount(item.amount)}
                 </Text>
               </TouchableOpacity>
             ))
@@ -229,7 +264,7 @@ export default function DashboardScreen() {
                     </View>
                   </View>
                   <Text className="text-zinc-400 text-xs font-medium mb-1" numberOfLines={1}>{item.name}</Text>
-                  <Text className="text-white text-xl font-bold">{symbol}{item.balance.toLocaleString()}</Text>
+                  <Text className="text-white text-xl font-bold">{symbol}{fmtAmount(item.balance)}</Text>
                 </View>
               )}
             />

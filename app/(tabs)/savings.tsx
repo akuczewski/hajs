@@ -102,7 +102,7 @@ export default function SavingsScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">{t('savings.totalNetWorth')}</Text>
-              <Text className="text-[#3B82F6] text-5xl font-extrabold tracking-tighter">{symbol}{totalNetWorth.toLocaleString()}</Text>
+              <Text className="text-[#3B82F6] text-5xl font-extrabold tracking-tighter">{symbol}{totalNetWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
             </View>
 
             <TouchableOpacity
@@ -164,7 +164,7 @@ export default function SavingsScreen() {
                   </View>
                 </View>
                 <View className="items-end">
-                  <Text className="text-white font-bold text-lg mb-2">{symbol}{acc.balance.toLocaleString()}</Text>
+                  <Text className="text-white font-bold text-lg mb-2">{symbol}{acc.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                   <View className="flex-row gap-2">
                     <TouchableOpacity
                       onPress={() => {
@@ -231,8 +231,8 @@ export default function SavingsScreen() {
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 flex-row items-center justify-between">
               <View>
                 <Text className="text-zinc-400 font-medium mb-1">{t('savings.totalSavingsGoals')}</Text>
-                <Text className="text-[#34D399] text-4xl font-extrabold tracking-tighter">{symbol}{totalSaved.toLocaleString()}</Text>
-                <Text className="text-zinc-500 text-xs mt-1">{t('savings.goal')}: {symbol}{totalTarget.toLocaleString()}</Text>
+                <Text className="text-[#34D399] text-4xl font-extrabold tracking-tighter">{symbol}{totalSaved.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                <Text className="text-zinc-500 text-xs mt-1">{t('savings.goal')}: {symbol}{totalTarget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
               </View>
               <View className="bg-[#262A2E] p-4 rounded-full border border-zinc-700">
                 <PiggyBank color="#34D399" size={32} />
@@ -317,8 +317,8 @@ export default function SavingsScreen() {
 
                   <View className="mb-4">
                     <View className="flex-row justify-between mb-2">
-                      <Text className="text-white font-bold">{symbol}{fund.savedAmount.toLocaleString()}</Text>
-                      <Text className="text-zinc-500 font-medium">{t('savings.of')} {symbol}{fund.targetAmount.toLocaleString()}</Text>
+                      <Text className="text-white font-bold">{symbol}{fund.savedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                      <Text className="text-zinc-500 font-medium">{t('savings.of')} {symbol}{fund.targetAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                     </View>
                     <View className="h-2 w-full bg-[#262A2E] rounded-full overflow-hidden">
                       <View className="h-full bg-[#8B5CF6] rounded-full" style={{ width: `${progressPercent}%` }} />

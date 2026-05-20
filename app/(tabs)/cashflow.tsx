@@ -193,7 +193,7 @@ export default function CashflowScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">{t('cashflow.totalMonthlyIncome')}</Text>
-              <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">{symbol}{totalIncome.toLocaleString()}</Text>
+              <Text className="text-[#34D399] text-5xl font-extrabold tracking-tighter">{symbol}{totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
             </View>
 
             <TouchableOpacity onPress={() => setIsAddingIncome(!isAddingIncome)} className="bg-[#1C1F22] border border-dashed border-zinc-700 py-4 rounded-2xl items-center flex-row justify-center mb-6">
@@ -243,7 +243,7 @@ export default function CashflowScreen() {
                       </View>
                       {/* Amount override */}
                       <TouchableOpacity onPress={() => openOverride(inc.id, 'INCOME', inc.name, currentAmt, inc.amount)} className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg">
-                        <Text className="text-white font-bold mr-1">{symbol}{currentAmt.toLocaleString()}</Text>
+                        <Text className="text-white font-bold mr-1">{symbol}{currentAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         <Pencil color="#A1A1AA" size={12} />
                       </TouchableOpacity>
                       {/* Edit name */}
@@ -275,7 +275,7 @@ export default function CashflowScreen() {
                     </View>
                     <View className="flex-row items-center gap-1">
                       <TouchableOpacity onPress={() => openOverride(inc.id, 'INCOME', inc.name, currentAmt, inc.amount)} className="flex-row items-center bg-[#262A2E] px-3 py-2 rounded-lg">
-                        <Text className="text-white font-bold mr-1">{symbol}{currentAmt.toLocaleString()}</Text>
+                        <Text className="text-white font-bold mr-1">{symbol}{currentAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         <Pencil color="#A1A1AA" size={12} />
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => openEdit('INCOME', inc)} className="bg-[#262A2E] p-2 rounded-lg">
@@ -298,7 +298,7 @@ export default function CashflowScreen() {
                         {hasAverage ? t('cashflow.calculatedAverage') : t('cashflow.baseAmount')}
                       </Text>
                       <Text className="text-[#34D399] font-bold text-lg">
-                        {symbol}{Math.round(projection).toLocaleString()}/mo
+                        {symbol}{Math.round(projection).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo
                       </Text>
                       {hasAverage && (
                         <Text className="text-zinc-600 text-[10px]">{t('cashflow.last3MonthsAvg')}</Text>
@@ -316,7 +316,7 @@ export default function CashflowScreen() {
           <View>
             <View className="bg-[#1C1F22] border border-[#272A2E] rounded-3xl p-6 mb-6 items-start">
               <Text className="text-zinc-400 font-medium mb-2">{t('cashflow.totalMonthlyExpenses')}</Text>
-              <Text className="text-yellow-500 text-5xl font-extrabold tracking-tighter">{symbol}{totalExpenses.toLocaleString()}</Text>
+              <Text className="text-yellow-500 text-5xl font-extrabold tracking-tighter">{symbol}{totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
             </View>
 
             <TouchableOpacity onPress={() => setIsAddingExpense(!isAddingExpense)} style={{ backgroundColor: 'rgba(234, 179, 8, 0.2)' }} className="border border-yellow-500 rounded-2xl py-4 flex-row justify-center items-center mb-6">
@@ -433,7 +433,7 @@ export default function CashflowScreen() {
                     </View>
                     <View className="flex-row items-center gap-1">
                       <TouchableOpacity onPress={() => openOverride(exp.id, 'FIXED_EXPENSE', exp.name, currentAmt, exp.amount)} className="flex-row items-center bg-[#262A2E] px-2 py-2 rounded-lg">
-                        <Text className="text-white font-bold text-sm mr-1">-{symbol}{currentAmt.toLocaleString()}</Text>
+                        <Text className="text-white font-bold text-sm mr-1">-{symbol}{currentAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         <Pencil color="#A1A1AA" size={12} />
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => openEdit('FIXED_EXPENSE', exp)} className="bg-[#262A2E] p-2 rounded-lg">
