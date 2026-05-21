@@ -1,6 +1,6 @@
 # Backlog
 
-## Ukończone — MVP (v1.0.0 – v1.2.0):
+## Ukończone — MVP (v1.0.0 – v1.2.1):
 1. [x] Inicjalizacja projektu Expo i konfiguracja NativeWind/Tailwind.
 2. [x] Przygotowanie architektury Zustand z AsyncStorage.
 3. [x] Przygotowanie modeli TypeScript (Incomes, FixedExpenses, SinkingFunds, Liabilities, Accounts).
@@ -17,34 +17,53 @@
 14. [x] Pełna dwujęzyczność EN/PL — uzupełniono brakujące klucze w sekcjach cashflow, savings, settings.
 15. [x] Wyodrębnienie współdzielonego hooka `useMonthNavigation` (eliminacja duplikacji kodu).
 16. [x] Dokumentacja projektu (CLAUDE.md) dla wspomagania AI.
+17. [x] Analityki: stacked bar chart przychód vs. wydatki, pull-to-refresh, monthly surplus.
 
-## Do zrobienia w wersji V2 (Funkcjonalności):
+---
 
-### Priorytet wysoki
-1. [ ] **Historia transakcji** — ręczne dodawanie transakcji z kategorią, tagiem i notatką; baza do raportów.
-2. [ ] **Kopia zapasowa iCloud / Google Drive** — migracja z AsyncStorage na expo-sqlite + zdalny sync; krytyczne przed utratą telefonu.
-3. [ ] **Edycja pozycji** — możliwość edycji nazwy, kategorii, typu bez konieczności usuwania i ponownego dodawania.
+## V2 — Faza 1: Fundament monetyzacji (najwyższy priorytet)
 
-### Priorytet średni
-4. [ ] **Budżet kategoriowy** — limit wydatków per kategoria w miesiącu (envelope budgeting) z wizualizacją przekroczeń.
-5. [ ] **Prognoza cashflow** — wykres na 12 miesięcy pokazujący kiedy skończą się środki przy obecnych trendach.
-6. [ ] **Wykresy trendów** — przychód vs. wydatki po miesiącach (ostatnie 12), breakdown per kategoria.
-7. [ ] **Powiadomienia push** — przypomnienia o płatnościach (np. 2 dni przed terminem raty).
-8. [ ] **Wskaźnik oszczędności** — % dochodu odkładany miesięcznie, trend rok do roku.
+> Prerequisite przed uruchomieniem paywallu. Bez tych elementów monetyzacja nie istnieje.
+> Szczegóły: [roadmap_v2.md](roadmap_v2.md)
 
-### Priorytet niski / Long-term
-9. [ ] **Live kursy walut** — pobieranie z API (aktualnie statyczne w `EXCHANGE_RATES`); aktualizacja Net Worth dla aktywów niefiatowych.
-10. [ ] **Export CSV/JSON** — własne dane w rękach użytkownika.
-11. [ ] **Biometria** — FaceID / TouchID do odblokowania aplikacji.
-12. [ ] **Widgety iOS** — Net Worth i Free Funds na ekranie głównym bez otwierania apki (WidgetKit).
-13. [ ] **Raport miesięczny/roczny** — PDF lub share summary z podsumowaniem przychodów, wydatków i oszczędności.
-14. [ ] **Kalkulator FIRE** — Financial Independence / Early Retirement: ile lat do wolności finansowej.
-15. [ ] **Multi-waluta per konto** — przeliczenia kont w różnych walutach (pole `Account.currency` już istnieje w modelu).
-16. [ ] **Dług snowball / avalanche** — kalkulator strategii spłaty kredytów z harmonogramem.
-17. [ ] **Import wyciągów bankowych (CSV/PDF)** — automatyczne kategoryzowanie transakcji.
-18. [ ] **Integracja Google API** — Gmail/Play do automatycznego wykrywania subskrypcji.
+1. [ ] **Edycja pozycji** — edycja nazwy, kwoty, kategorii i typu bez usuwania i ponownego dodawania. Blocker UX.
+2. [ ] **RevenueCat integracja** — SDK do zarządzania subskrypcjami (App Store + Google Play). Prerequisite dla paywallu.
+3. [ ] **iCloud / Google Drive backup** — migracja z AsyncStorage na expo-sqlite + zdalny sync. Najsilniejszy hook konwersji Free→Premium.
+4. [ ] **Ekran onboardingu + paywall UI** — przedstawienie tierów Free/Premium/Lifetime, ekran powitalny.
 
-## Tech Debt (zidentyfikowany, do adresowania):
-- [ ] `Account.currency` pole istnieje w modelu ale nie jest używane w obliczeniach (wszystkie konta traktowane są jako waluta globalna store'a).
-- [ ] `AsyncStorage` ma limit ~6 MB — przy rozbudowie o historię transakcji konieczna migracja na `expo-sqlite`.
-- [ ] Statyczne kursy walut w `EXCHANGE_RATES` — wymagają ręcznej aktualizacji przy zmianie kursów.
+## V2 — Faza 2: Konwersja i retencja
+
+5. [ ] **Push notifications** — przypomnienia o płatnościach (2 dni przed terminem). Premium.
+6. [ ] **Budżet kategoriowy (envelope budgeting)** — limit wydatków per kategoria z wizualizacją przekroczeń. Premium.
+7. [ ] **iOS Widgets** — Net Worth i Free Funds na ekranie głównym (WidgetKit). Premium.
+8. [ ] **Biometria** — FaceID / TouchID do odblokowania aplikacji. Premium.
+
+## V2 — Faza 3: Differentiatory
+
+9. [ ] **Kalkulator FIRE** — Financial Independence/Early Retirement: ile lat do wolności finansowej. Premium.
+10. [ ] **Kalkulator dług snowball/avalanche** — strategia spłaty z harmonogramem. Premium.
+11. [ ] **Export CSV / PDF raport miesięczny** — dane we własnych rękach użytkownika. Premium.
+12. [ ] **Wspólny budżet dla par/rodziny** — drugi użytkownik z dostępem do tego samego budżetu. Premium.
+
+## V2 — Faza 4: Long-term / V3
+
+13. [ ] **Live kursy walut** — pobieranie z API (aktualnie statyczne w `EXCHANGE_RATES`).
+14. [ ] **Drag & drop kolejność pozycji** — personalizacja list przychodów/wydatków/celów.
+15. [ ] **Prognoza cashflow 12 miesięcy** — wykres skumulowanych środków lub deficytu.
+16. [ ] **Import wyciągów CSV** — ręczny import z banku (PKO BP, mBank, ING PL) bez bank API.
+17. [ ] **Multi-waluta per konto** — przeliczenia kont w różnych walutach (pole `Account.currency` już istnieje).
+18. [ ] **Wskaźnik oszczędności** — % dochodu odkładany miesięcznie, trend rok do roku.
+
+## Parked (wysoki próg wejścia)
+
+- **Bank API / pobieranie transakcji** — wymaga licencji AISP od KNF lub płatnego agregatora (€50-200/mies). Wrócimy gdy będzie cashflow z subskrypcji.
+- **Historia transakcji** — powiązana z bank API; wrócimy razem z importem CSV jako pierwszym krokiem.
+- **Google OAuth / Gmail integracja** — skomplikowany App Store review, ryzyko privacy.
+
+---
+
+## Tech Debt (do adresowania):
+- [ ] `Account.currency` pole istnieje w modelu ale nie jest używane w obliczeniach.
+- [ ] `AsyncStorage` ma limit ~6 MB — przy backupie konieczna migracja na `expo-sqlite`.
+- [ ] Statyczne kursy walut w `EXCHANGE_RATES` — wymagają ręcznej aktualizacji.
+- [ ] `Income.history` legacy field nadal w typach (`store/types.ts:9`).
