@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useBudgetStore, CURRENCY_SYMBOLS, calculateMonthlyRequired, getSinkingFundBreakEven } from '../../store/useBudgetStore';
 import { useTranslation } from '../../store/i18n';
-import { PiggyBank, Target, Plus, ShieldCheck, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, CalendarDays, Home, Car } from 'lucide-react-native';
+import { PiggyBank, Target, Plus, ShieldCheck, Wallet, Landmark, Banknote, Bitcoin, LineChart, Coins, Trash2, CheckCircle, CalendarDays, Home, Car, Pencil } from 'lucide-react-native';
 import { AccountType } from '../../store/types';
 import MonthPickerModal from '../../components/MonthPickerModal';
 
@@ -19,7 +19,7 @@ const ACCOUNT_ICONS: Record<AccountType, any> = {
 };
 
 export default function SavingsScreen() {
-  const { sinkingFunds, addSinkingFund, deleteSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency, activeMonth } = useBudgetStore();
+  const { sinkingFunds, addSinkingFund, deleteSinkingFund, updateSinkingFund, accounts, addAccount, deleteAccount, updateAccount, toggleSinkingFundPayment, currency, activeMonth } = useBudgetStore();
   const { t } = useTranslation();
   const symbol = CURRENCY_SYMBOLS[currency] || 'zł';
   const [activeTab, setActiveTab] = useState<'ASSETS' | 'GOALS'>('ASSETS');
@@ -33,6 +33,12 @@ export default function SavingsScreen() {
   const [goalTarget, setGoalTarget] = useState('');
   const [goalDeadline, setGoalDeadline] = useState('');
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+
+  const [editingFund, setEditingFund] = useState<string | null>(null);
+  const [editFundName, setEditFundName] = useState('');
+  const [editFundTarget, setEditFundTarget] = useState('');
+  const [editFundDeadline, setEditFundDeadline] = useState('');
+  const [isEditDatePickerVisible, setIsEditDatePickerVisible] = useState(false);
 
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [assetName, setAssetName] = useState('');
@@ -309,6 +315,17 @@ export default function SavingsScreen() {
                           </View>
                         )}
                       </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEditingFund(fund.id);
+                          setEditFundName(fund.name);
+                          setEditFundTarget(fund.targetAmount.toString());
+                          setEditFundDeadline(fund.deadline);
+                        }}
+                        className="bg-[#262A2E] p-2 rounded-xl"
+                      >
+                        <Pencil color="#60A5FA" size={16} />
+                      </TouchableOpacity>
                       <TouchableOpacity onPress={() => deleteSinkingFund(fund.id)} className="bg-[#262A2E] p-2 rounded-xl">
                         <Trash2 color="#EF4444" size={16} />
                       </TouchableOpacity>
@@ -377,6 +394,69 @@ export default function SavingsScreen() {
         currentValue={goalDeadline}
         title={t('savings.selectDeadline')}
       />
+
+      <MonthPickerModal
+        visible={isEditDatePickerVisible}
+        onClose={() => setIsEditDatePickerVisible(false)}
+        onSelect={setEditFundDeadline}
+        currentValue={editFundDeadline}
+        title={t('savings.selectDeadline')}
+      />
+
+      <Modal visible={!!editingFund} transparent animationType="slide">
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={() => setEditingFund(null)} />
+          <View style={{ backgroundColor: '#1C1F22', borderTopLeftRadius: 28, borderTopRightRadius: 28, borderTopWidth: 1, borderColor: '#272A2E', padding: 24 }}>
+            <View style={{ width: 36, height: 4, backgroundColor: '#3F3F46', borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
+            <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 20 }}>{t('savings.editGoal')}</Text>
+            <TextInput
+              placeholder={t('savings.goalName')}
+              placeholderTextColor="#71717A"
+              style={{ backgroundColor: '#262A2E', color: '#fff', padding: 14, borderRadius: 12, marginBottom: 12, fontSize: 15 }}
+              value={editFundName}
+              onChangeText={setEditFundName}
+            />
+            <TextInput
+              placeholder={`${t('savings.targetAmount')} (${symbol})`}
+              placeholderTextColor="#71717A"
+              keyboardType="numeric"
+              style={{ backgroundColor: '#262A2E', color: '#fff', padding: 14, borderRadius: 12, marginBottom: 12, fontSize: 15 }}
+              value={editFundTarget}
+              onChangeText={setEditFundTarget}
+            />
+            <TouchableOpacity
+              onPress={() => setIsEditDatePickerVisible(true)}
+              style={{ backgroundColor: '#262A2E', padding: 14, borderRadius: 12, marginBottom: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Text style={{ color: editFundDeadline ? '#fff' : '#71717A', fontSize: 15 }}>{editFundDeadline || t('savings.deadline')}</Text>
+              <CalendarDays color="#71717A" size={20} />
+            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => setEditingFund(null)}
+                style={{ flex: 1, backgroundColor: '#262A2E', paddingVertical: 16, borderRadius: 14, alignItems: 'center' }}
+              >
+                <Text style={{ color: '#A1A1AA', fontWeight: '700' }}>{t('settings.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (!editFundName || !editFundTarget || !editFundDeadline || !editingFund) return;
+                  updateSinkingFund(editingFund, {
+                    name: editFundName,
+                    targetAmount: parseFloat(editFundTarget) || 0,
+                    deadline: editFundDeadline,
+                  });
+                  setEditingFund(null);
+                }}
+                style={{ flex: 1, backgroundColor: '#34D399', paddingVertical: 16, borderRadius: 14, alignItems: 'center' }}
+              >
+                <Text style={{ color: '#022C22', fontWeight: '700' }}>{t('savings.saveGoal')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 8 }} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

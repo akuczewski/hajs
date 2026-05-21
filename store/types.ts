@@ -68,6 +68,8 @@ export interface AppState {
   incomeOrder: string[];
   expenseOrder: string[];
   liabilityOrder: string[];
+  hasCompletedOnboarding: boolean;
+  isPremium: boolean;
 
   // CRUD
   addIncome: (income: Income) => void;
@@ -85,6 +87,7 @@ export interface AppState {
   updateIncome: (id: string, updates: Partial<Omit<Income, 'id' | 'createdAt'>>) => void;
   updateFixedExpense: (id: string, updates: Partial<Omit<FixedExpense, 'id' | 'createdAt'>>) => void;
   updateLiability: (id: string, updates: Partial<Omit<Liability, 'id' | 'createdAt'>>) => void;
+  updateSinkingFund: (id: string, updates: Partial<Omit<SinkingFund, 'id' | 'createdAt'>>) => void;
 
   // Reorder
   reorderIncome: (fromIndex: number, toIndex: number) => void;
@@ -110,4 +113,6 @@ export interface AppState {
   recordNetWorthSnapshot: () => void;
 
   resetApp: () => void;
+  completeOnboarding: () => void;
+  setIsPremium: (value: boolean) => void;
 }

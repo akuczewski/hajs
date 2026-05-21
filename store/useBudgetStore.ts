@@ -162,6 +162,8 @@ export const useBudgetStore = create<AppState>()(
       incomeOrder: ['1'],
       expenseOrder: ['1'],
       liabilityOrder: [],
+      hasCompletedOnboarding: false,
+      isPremium: false,
 
       addIncome: (income) => set((state) => ({
         incomes: [...state.incomes, income],
@@ -189,6 +191,9 @@ export const useBudgetStore = create<AppState>()(
 
       addSinkingFund: (fund) => set((state) => ({ sinkingFunds: [...state.sinkingFunds, fund] })),
       deleteSinkingFund: (id) => set((state) => ({ sinkingFunds: state.sinkingFunds.filter(s => s.id !== id) })),
+      updateSinkingFund: (id, updates) => set((state) => ({
+        sinkingFunds: state.sinkingFunds.map(s => s.id === id ? { ...s, ...updates } : s),
+      })),
 
       addLiability: (liability) => set((state) => ({
         liabilities: [...state.liabilities, liability],
@@ -296,6 +301,9 @@ export const useBudgetStore = create<AppState>()(
       })),
 
       recordNetWorthSnapshot: () => _snapshotNetWorth(get, set),
+
+      completeOnboarding: () => set(() => ({ hasCompletedOnboarding: true })),
+      setIsPremium: (value) => set(() => ({ isPremium: value })),
 
       resetApp: () => set(() => ({
         incomes: [],
