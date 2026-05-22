@@ -6,7 +6,7 @@ import { PurchasesPackage } from 'react-native-purchases';
 import { getOfferings, purchasePackage, restorePurchases } from '../store/useSubscriptionStore';
 import { useBudgetStore } from '../store/useBudgetStore';
 import { useTranslation } from '../store/i18n';
-import { PRODUCT_ANNUAL, PRODUCT_LIFETIME } from '../constants/revenueCat';
+import { PRODUCT_MONTHLY, PRODUCT_ANNUAL, PRODUCT_LIFETIME } from '../constants/revenueCat';
 
 const FEATURES = [
   { icon: Shield, key: 'feature1' as const },
@@ -59,6 +59,7 @@ export default function PaywallScreen() {
     if (!restored) Alert.alert('', 'No active subscription found.');
   };
 
+  const monthlyPkg = packages.find(p => p.product.identifier === PRODUCT_MONTHLY);
   const annualPkg = packages.find(p => p.product.identifier === PRODUCT_ANNUAL);
   const lifetimePkg = packages.find(p => p.product.identifier === PRODUCT_LIFETIME);
 
@@ -107,7 +108,7 @@ export default function PaywallScreen() {
           </View>
         ) : (
           <View style={{ paddingHorizontal: 24, gap: 12, marginBottom: 24 }}>
-            {/* Annual */}
+            {/* Annual — highlighted as default */}
             <TouchableOpacity
               onPress={() => setSelected(PRODUCT_ANNUAL)}
               style={{
@@ -152,6 +153,27 @@ export default function PaywallScreen() {
               </View>
               <View style={{ backgroundColor: 'rgba(234,179,8,0.15)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
                 <Text style={{ color: '#EAB308', fontWeight: '700', fontSize: 12 }}>{t('paywall.lifetimeBadge')}</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Monthly — shown last, positioned as least attractive */}
+            <TouchableOpacity
+              onPress={() => setSelected(PRODUCT_MONTHLY)}
+              style={{
+                backgroundColor: '#1C1F22',
+                borderRadius: 18,
+                padding: 18,
+                borderWidth: 2,
+                borderColor: selected === PRODUCT_MONTHLY ? '#6B7280' : '#272A2E',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#A1A1AA', fontWeight: '700', fontSize: 16 }}>{t('paywall.monthlyLabel')}</Text>
+                <Text style={{ color: '#9CA3AF', fontWeight: '800', fontSize: 22, marginTop: 4 }}>
+                  {monthlyPkg?.product.priceString ?? t('paywall.monthlyPrice')}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
