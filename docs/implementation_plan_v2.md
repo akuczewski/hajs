@@ -1,14 +1,65 @@
 # Plan implementacji V2
 
-> Branch roboczy: `develop`  
-> Ostatnia aktualizacja: 2026-05-21  
+> Branch roboczy: `monetization`  
+> Ostatnia aktualizacja: 2026-05-22  
 > Powiązane dokumenty: [roadmap_v2.md](roadmap_v2.md) | [backlog.md](backlog.md)
+
+---
+
+## Status Fazy 1 — ZAIMPLEMENTOWANE ✅
+
+| Element | Status | Commit |
+|---|---|---|
+| `updateSinkingFund` + edit UI w savings | ✅ Done | `583e8c3` |
+| `hasCompletedOnboarding` + `isPremium` w store | ✅ Done | `583e8c3` |
+| `react-native-purchases` zainstalowany | ✅ Done | `583e8c3` |
+| `constants/revenueCat.ts` (klucze, product IDs) | ✅ Done | `dd36478` |
+| `store/useSubscriptionStore.ts` | ✅ Done | `583e8c3` |
+| `app/onboarding.tsx` (4 slajdy) | ✅ Done | `583e8c3` |
+| `app/paywall.tsx` (monthly/yearly/lifetime) | ✅ Done | `dd36478` |
+| OnboardingGuard w `_layout.tsx` | ✅ Done | `583e8c3` |
+| Guard dla istniejących userów (auto-complete) | ✅ Done | `HEAD` |
+| Sekcja Premium w `settings.tsx` | ✅ Done | `583e8c3` |
+| i18n klucze EN + PL (onboarding, paywall) | ✅ Done | `583e8c3` |
+
+## Manualne kroki przed buildem produkcyjnym
+
+### 🔴 Wymagane (bez tego zakupy nie działają)
+
+1. **App Store Connect — produkty IAP**
+   - Zaloguj do [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
+   - Twoja apka → In-App Purchases → "+"
+   - Utwórz: `monthly` (Auto-Renewable, ~11 PLN), `yearly` (Auto-Renewable, ~99 PLN), `lifetime` (Non-Consumable, ~199 PLN)
+   - Każdy produkt wymaga: nazwa, opis, zrzut ekranu do review, cena
+
+2. **RevenueCat ↔ App Store Connect API**
+   - RevenueCat dashboard → Project Settings → App Store Connect API
+   - Wgraj klucz API z App Store Connect (Users & Access → Keys → App Store Connect API)
+   - Bez tego RevenueCat nie może walidować zakupów
+
+3. **RevenueCat — Entitlement + Offering**
+   - Entitlements → utwórz `premium` → przypisz `monthly`, `yearly`, `lifetime`
+   - Offerings → `default` → dodaj packages z tymi produktami
+
+4. **Privacy Policy URL**
+   - App Store wymaga polityki prywatności przy IAP
+   - Możesz użyć generatora (np. termly.io) lub napisać własną
+
+### 🟡 Przed oddaniem do review
+
+5. **Sandbox test purchase**
+   - EAS dev build na urządzeniu
+   - App Store Connect → Users & Access → Sandbox Testers → utwórz konto
+   - Przetestuj pełny flow: paywall → zakup → weryfikacja Premium → restore
+
+6. **App Review Notes**
+   - Podaj dane sandbox testera do recenzenta App Store
 
 ---
 
 ## Zasady pracy
 
-- Wszystkie zmiany V2 na branchu `develop`, merge do `main` przez PR po ukończeniu fazy
+- Wszystkie zmiany V2 na branchu `monetization`, merge do `main` przez PR po ukończeniu fazy
 - Każda funkcja = osobny commit z prefixem `feat:` / `fix:` / `refactor:`
 - Przed każdym merge do `main` — build TestFlight (EAS Build)
 - RevenueCat integracja musi być gotowa **przed** jakimkolwiek paywallem w UI

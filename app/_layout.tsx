@@ -14,11 +14,18 @@ export const unstable_settings = {
 };
 
 function OnboardingGuard() {
-  const { hasCompletedOnboarding } = useBudgetStore();
+  const { hasCompletedOnboarding, completeOnboarding, incomes, fixedExpenses, accounts, liabilities, sinkingFunds } = useBudgetStore();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
+    // Existing users upgrading from pre-onboarding version: auto-complete if they have data
+    const hasExistingData = incomes.length > 0 || fixedExpenses.length > 0 || accounts.length > 0 || liabilities.length > 0 || sinkingFunds.length > 0;
+    if (!hasCompletedOnboarding && hasExistingData) {
+      completeOnboarding();
+      return;
+    }
+
     const segs = segments as string[];
     const inOnboarding = segs[0] === 'onboarding';
     if (!hasCompletedOnboarding && !inOnboarding) {
